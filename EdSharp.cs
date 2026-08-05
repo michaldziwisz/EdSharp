@@ -838,7 +838,7 @@ public ToolStripMenuItem menuEdit, menuEditSelectAll, menuEditUnselectAll, menuE
 public ToolStripMenuItem menuDelete, menuDeleteReplaceRegular, menuDeleteReplaceWithRegExp, menuDeleteHardLine, menuDeleteParagraph, menuDeleteLine, menuDeleteRight, menuDeleteLeft, menuDeleteDown, menuDeleteUp, menuDeleteFile, menuDeleteTrimBlanks;
 public ToolStripMenuItem menuNavigate, menuNavigateForwardFind, menuNavigateReverseFind, menuNavigateForwardFindWithRegExp, menuNavigateReverseFindWithRegExp,  menuNavigateForwardFindAtCursor, menuNavigateReverseFindAtCursor, menuNavigateForwardFindAgain, menuNavigateReverseFindAgain, menuNavigateJumpToLine, menuNavigateJumpToLineAgain, menuNavigateGoToPercent, menuNavigateGoToPercentAgain, menuNavigateGoToPart, menuNavigateSetBookmark, menuNavigateClearBookmark, menuNavigateGoToBookmark, menuNavigateHomeCharacter, menuNavigateEndCharacter, menuNavigateStartTag, menuNavigateEndTag,  menuNavigateNextJustify, menuNavigatePriorJustify, menuNavigateNextStyle, menuNavigatePriorStyle, menuNavigateNextBaseline, menuNavigatePriorBaseline, menuNavigateNextFont, menuNavigatePriorFont, menuNavigateRightBrace, menuNavigateNextBlock, menuNavigatePriorBlock, menuNavigateLeftBrace, menuNavigateNextIndent, menuNavigatePriorIndent, menuNavigateNextChunk,  menuNavigatePriorChunk, menuNavigateNextSentence, menuNavigatePriorSentence, menuNavigateNextParagraph, menuNavigatePriorParagraph, menuNavigateNextPart, menuNavigatePriorPart, menuNavigateNextSection, menuNavigatePriorSection, menuNavigateGoToSection, menuNavigateGoToContents, menuNavigateSearchForTopic, menuNavigateSearchForTopicAgain, menuNavigateGoToStartOfSelection;
 public ToolStripMenuItem menuQuery, menuQueryAddress, menuQueryBraces, menuQueryBlock, menuQueryIndent, menuQueryPath, menuQueryTopic, menuQueryYield, menuQueryStatus, menuQueryCompiler, menuQuerySelected, menuQueryChunk, menuQueryReadAll, menuQueryWindowsOpen, menuQueryClipboard, menuQueryTime, menuQueryStyles, menuQueryFont;
-public ToolStripMenuItem menuMisc, menuMiscSetDefaultFont, menuMiscConfigurationOptions, menuMiscManualOptions, menuMiscResetConfiguration, menuMiscGoToFolder, menuMiscGoToSpecialFolder, menuMiscWordWrap, menuMiscUnwrap, menuMiscExtraSpeechToggle, menuMiscExtraSpeechLog, menuMiscEnvironmentVariables, menuMiscSpellCheck, menuMiscThesaurus, menuMiscLookupTerm, menuMiscTranslateLanguage, menuMiscGuardDocument, menuMiscNoGuard, menuMiscPyBrace, menuMiscPyDent, menuMiscInferIndent, menuMiscFormatCode, menuMiscRepeatLine, menuMiscSectionBreak, menuMiscPathToClipboard, menuMiscPathList, menuMiscInsertTime, menuMiscCalculateDate, menuMiscHTMLFormat, menuMiscTextConvert, menuMiscTextCombine, menuMiscTextContents, menuMiscYieldWithRegExp, menuMiscExtractWithRegExp, menuMiscRunAtCursor, menuMiscSpecialCharacter, menuMiscEvaluateExpression, menuMiscReplaceTokens, menuMiscTransformFiles, menuMiscGoToEnvironment, menuMiscCompile, menuMiscPickCompiler, menuMiscPromptCommand, menuMiscReviewOutput, menuMiscSaveSnippet, menuMiscInvokeSnippet, menuMiscViewSnippet, menuMiscKeepUniqueItems, menuMiscNumberItems, menuMiscOrderItems, menuMiscReverseItems, menuMiscListDifferentItems, menuMiscQueryCommonItems, menuMiscExplorerFolder, menuMiscCommandPrompt, menuMiscBurnToCD, menuMiscWebDownload, menuMiscWebClientUtilities;
+public ToolStripMenuItem menuMisc, menuMiscSetDefaultFont, menuMiscConfigurationOptions, menuMiscManualOptions, menuMiscResetConfiguration, menuMiscGoToFolder, menuMiscGoToSpecialFolder, menuMiscWordWrap, menuMiscUnwrap, menuMiscExtraSpeechToggle, menuMiscExtraSpeechLog, menuMiscEnvironmentVariables, menuMiscSpellCheck, menuMiscThesaurus, menuMiscLookupTerm, menuMiscTranslateLanguage, menuMiscGuardDocument, menuMiscNoGuard, menuMiscPyBrace, menuMiscPyDent, menuMiscInferIndent, menuMiscFormatCode, menuMiscRepeatLine, menuMiscSectionBreak, menuMiscPathToClipboard, menuMiscPathList, menuMiscInsertTime, menuMiscCalculateDate, menuMiscTextConvert, menuMiscTextCombine, menuMiscTextContents, menuMiscYieldWithRegExp, menuMiscExtractWithRegExp, menuMiscRunAtCursor, menuMiscSpecialCharacter, menuMiscEvaluateExpression, menuMiscReplaceTokens, menuMiscTransformFiles, menuMiscGoToEnvironment, menuMiscCompile, menuMiscPickCompiler, menuMiscPromptCommand, menuMiscReviewOutput, menuMiscSaveSnippet, menuMiscInvokeSnippet, menuMiscViewSnippet, menuMiscKeepUniqueItems, menuMiscNumberItems, menuMiscOrderItems, menuMiscReverseItems, menuMiscListDifferentItems, menuMiscQueryCommonItems, menuMiscExplorerFolder, menuMiscCommandPrompt, menuMiscBurnToCD, menuMiscWebDownload, menuMiscWebClientUtilities;
 public ToolStripMenuItem menuWindow, menuWindowNext, menuWindowPrior, menuWindowArrangeIcons, menuWindowCascade, menuWindowTileHorizontal, menuWindowTileVertical;
 public ToolStripMenuItem menuHelp, menuHelpAbout, menuHelpDocumentation, menuHelpTutorial, menuHelpHistoryOfChanges, menuHelpKeyDescriber, menuHelpHotKeySummary, menuHelpAlternateMenu, menuHelpContextMenu, menuHelpSendToMenu, menuHelpElevateVersion;
 public StatusStrip statusBar;
@@ -962,7 +962,7 @@ menuNavigatePriorJustify = CreateMenuItem("Prior Alignment", "Control+OemOpenBra
 menuNavigateNextStyle = CreateMenuItem("Next Style", "Control+OemQuestion", menuItem_Click, "child silent");
 menuNavigatePriorStyle = CreateMenuItem("Prior Style", "Control+Shift+OemQuestion", menuItem_Click, "child silent");
 menuNavigateNextBaseline = CreateMenuItem("Next Baseline", "Control+D6", menuItem_Click, "child silent");
-menuNavigatePriorBaseline = CreateMenuItem("Prior Baseline", "Control+Shift+D6", menuItem_Click, "child silent");
+menuNavigatePriorBaseline = CreateMenuItem("Prior Baseline", "Control+Alt+D6", menuItem_Click, "child silent");
 menuNavigateNextFont = CreateMenuItem("Next Font", "Control+OemMinus", menuItem_Click, "child silent");
 menuNavigatePriorFont = CreateMenuItem("Prior Font", "Control+Shift+OemMinus", menuItem_Click, "child silent");
 menuNavigateRightBrace = CreateMenuItem("Right Brace", "Control+Shift+OemCloseBrackets", menuItem_Click, "child silent");
@@ -1016,7 +1016,7 @@ menuMiscConfigurationOptions = CreateMenuItem("Configuration Options ...", "Alt+
 menuMiscManualOptions = CreateMenuItem("Manual Options", "Alt+Shift+M", menuItem_Click, "frame silent");
 menuMiscResetConfiguration = CreateMenuItem("Reset Configuration", "Alt+Shift+D0", menuItem_Click, "frame silent");
 menuMiscGoToFolder = CreateMenuItem("Go to Folder", "Control+D0", menuItem_Click, "frame silent");
-menuMiscGoToSpecialFolder = CreateMenuItem("Go to Special Folder", "Control+Shift+D0", menuItem_Click, "frame silent");
+menuMiscGoToSpecialFolder = CreateMenuItem("Go to Special Folder", "Control+Alt+D0", menuItem_Click, "frame silent");
 menuMiscWordWrap = CreateMenuItem("&Word Wrap", "Control+W", menuItem_Click, "child speak");
 menuMiscUnwrap = CreateMenuItem("Unwrap", "Control+Shift+W", menuItem_Click, "child speak");
 menuMiscExtraSpeechToggle = CreateMenuItem("Extra Speech Toggle", "Control+Shift+X", menuItem_Click, "frame silent");
@@ -1038,7 +1038,6 @@ menuMiscPathToClipboard = CreateMenuItem("Path to Clipboard", "Alt+Shift+P", men
 menuMiscPathList = CreateMenuItem("Path List", "Control+Shift+P", menuItem_Click, "frame speak");
 menuMiscInsertTime = CreateMenuItem("Insert Time", "Alt+Shift+OemSemicolon", menuItem_Click, "child speak");
 menuMiscCalculateDate = CreateMenuItem("Calculate Date ...", "Control+Shift+OemSemicolon", menuItem_Click, "child silent");
-menuMiscHTMLFormat = CreateMenuItem("HTML Format", "Control+H", menuItem_Click, "child speak");
 menuMiscTextConvert = CreateMenuItem("&Text Convert", "Control+T", menuItem_Click, "child speak");
 menuMiscTextCombine = CreateMenuItem("Text Combine", "Control+Shift+T", menuItem_Click, "child speak");
 menuMiscTextContents = CreateMenuItem("Text Contents", "Alt+Shift+T", menuItem_Click, "child speak");
@@ -1069,7 +1068,7 @@ menuMiscCommandPrompt = CreateMenuItem("Command Prompt", "Control+Oem5", menuIte
 menuMiscBurnToCD = CreateMenuItem("Burn to CD", "Alt+Shift+B", menuItem_Click, "child speak");
 menuMiscWebDownload = CreateMenuItem("Web Download", "Alt+Shift+W", menuItem_Click, "frame speak");
 menuMiscWebClientUtilities = CreateMenuItem("Web Client Utilities", "Alt+Shift+Space", menuItem_Click, "frame speak");
-menuMisc.DropDownItems.AddRange(new ToolStripItem[] {menuMiscSetDefaultFont, menuMiscConfigurationOptions, menuMiscManualOptions, menuMiscResetConfiguration, menuMiscGoToFolder, menuMiscGoToSpecialFolder, menuMiscWordWrap, menuMiscUnwrap, menuMiscExtraSpeechToggle, menuMiscExtraSpeechLog, menuMiscEnvironmentVariables, menuMiscSpellCheck, menuMiscThesaurus, menuMiscLookupTerm, menuMiscTranslateLanguage, menuMiscGuardDocument, menuMiscNoGuard, menuMiscPyBrace, menuMiscPyDent, menuMiscInferIndent, menuMiscFormatCode, menuMiscRepeatLine, menuMiscSectionBreak, menuMiscPathToClipboard, menuMiscPathList, menuMiscInsertTime, menuMiscCalculateDate, menuMiscHTMLFormat, menuMiscTextConvert, menuMiscTextCombine, menuMiscTextContents, menuMiscYieldWithRegExp, menuMiscExtractWithRegExp, menuMiscRunAtCursor, menuMiscSpecialCharacter, menuMiscEvaluateExpression, menuMiscReplaceTokens, menuMiscTransformFiles, menuMiscGoToEnvironment, menuMiscCompile, menuMiscPickCompiler, menuMiscPromptCommand, menuMiscReviewOutput, menuMiscSaveSnippet, menuMiscInvokeSnippet, menuMiscViewSnippet, menuMiscKeepUniqueItems, menuMiscNumberItems, menuMiscOrderItems, menuMiscReverseItems, menuMiscListDifferentItems, menuMiscQueryCommonItems, menuMiscExplorerFolder, menuMiscCommandPrompt, menuMiscBurnToCD, menuMiscWebDownload, menuMiscWebClientUtilities});
+menuMisc.DropDownItems.AddRange(new ToolStripItem[] {menuMiscSetDefaultFont, menuMiscConfigurationOptions, menuMiscManualOptions, menuMiscResetConfiguration, menuMiscGoToFolder, menuMiscGoToSpecialFolder, menuMiscWordWrap, menuMiscUnwrap, menuMiscExtraSpeechToggle, menuMiscExtraSpeechLog, menuMiscEnvironmentVariables, menuMiscSpellCheck, menuMiscThesaurus, menuMiscLookupTerm, menuMiscTranslateLanguage, menuMiscGuardDocument, menuMiscNoGuard, menuMiscPyBrace, menuMiscPyDent, menuMiscInferIndent, menuMiscFormatCode, menuMiscRepeatLine, menuMiscSectionBreak, menuMiscPathToClipboard, menuMiscPathList, menuMiscInsertTime, menuMiscCalculateDate, menuMiscTextConvert, menuMiscTextCombine, menuMiscTextContents, menuMiscYieldWithRegExp, menuMiscExtractWithRegExp, menuMiscRunAtCursor, menuMiscSpecialCharacter, menuMiscEvaluateExpression, menuMiscReplaceTokens, menuMiscTransformFiles, menuMiscGoToEnvironment, menuMiscCompile, menuMiscPickCompiler, menuMiscPromptCommand, menuMiscReviewOutput, menuMiscSaveSnippet, menuMiscInvokeSnippet, menuMiscViewSnippet, menuMiscKeepUniqueItems, menuMiscNumberItems, menuMiscOrderItems, menuMiscReverseItems, menuMiscListDifferentItems, menuMiscQueryCommonItems, menuMiscExplorerFolder, menuMiscCommandPrompt, menuMiscBurnToCD, menuMiscWebDownload, menuMiscWebClientUtilities});
 //Dialog.Show("Misc.", menuMisc.DropDownItems.Count);
 
 menuWindow = CreateMenu("&Window");
@@ -4788,21 +4787,6 @@ AddMessage(sText);
 
 if (menuItem == menuMiscCalculateDate) {
 CalculateDate();
-}
-
-if (menuItem == menuMiscHTMLFormat) {
-// Treat the current document as Markdown source and convert it to a complete
-// HTML document with the bundled Pandoc, then open the result in a new window.
-string sBaseName = (child.File != null && child.File.Length > 0) ? Path.GetFileNameWithoutExtension(child.File) : "Untitled";
-string sHtml = Util.Markdown2Html(rtb.Text, sBaseName);
-if (sHtml.Length > 0) {
-if (child.File != null && child.File.IndexOf(@":\") > 0) Directory.SetCurrentDirectory(Path.GetDirectoryName(child.File));
-sFile = sBaseName + ".htm";
-new MdiChild(this, sFile);
-this.Child.File = sFile;
-this.Child.RTB.Text = sHtml;
-this.Child.RTB.Modified = false;
-}
 }
 
 if (menuItem == menuMiscTextConvert || menuItem == menuMiscTextCombine) {
@@ -15063,42 +15047,6 @@ string sReturn = (string) COM.GetProperty(oShortcut, "TargetPath");
 //COM.Release(ref oShell);
 return sReturn;
 } // GetLfn method
-
-public static string Markdown2Html(string sSource, string sTitle) {
-// Convert Markdown source to a complete (standalone) HTML document using the
-// bundled Pandoc, returning the HTML.  Returns "" if the conversion could not
-// be done, after showing a message.  Used by the HTML Format command, which
-// now assumes the current document is Markdown rather than encoding it
-// literally.  Modern Pandoc flags only (no removed -S/--smart).
-string sPandoc = Path.Combine(App.ProgramDir, @"Convert\Pandoc\pandoc.exe");
-if (!File.Exists(sPandoc)) {
-Dialog.Show("HTML Format", "Pandoc was not found at\n" + sPandoc + "\nRun BuildEdSharp.cmd once to fetch the Convert tools, then try again.");
-return "";
-}
-string sStem = "edsharp_md2htm_" + Guid.NewGuid().ToString("N");
-string sMarkdownFile = Path.Combine(Path.GetTempPath(), sStem + ".md");
-string sHtmlFile = Path.Combine(Path.GetTempPath(), sStem + ".htm");
-App.TempFiles.Add(sMarkdownFile);
-App.TempFiles.Add(sHtmlFile);
-string sHtml = "";
-try {
-Util.String2FileU(sSource, sMarkdownFile);
-string sCommand = Util.Quote(sPandoc) + " " + Util.Quote(sMarkdownFile) + " -f gfm -t html5 -s --metadata title=" + Util.Quote(sTitle) + " -o " + Util.Quote(sHtmlFile);
-App.Frame.AddMessage("Converting Markdown to HTML");
-Util.RunHideWait(sCommand);
-if (!File.Exists(sHtmlFile)) Util.RunHideWait("cmd.exe /c " + sCommand);
-if (!File.Exists(sHtmlFile)) {
-Dialog.Show("HTML Format", "Pandoc did not produce HTML output.\nThe document may not be valid Markdown source.");
-return "";
-}
-sHtml = Util.File2String(sHtmlFile);
-}
-catch (Exception ex) {
-Dialog.Show("HTML Format", "Could not convert Markdown to HTML.\n" + ex.Message);
-return "";
-}
-return sHtml;
-} // Markdown2Html method
 
 public static string String2Html(string sText) {
 // Use System.Net.WebUtility.HtmlEncode (in System.dll, always loaded)
