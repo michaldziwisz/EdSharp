@@ -28,10 +28,10 @@ using Tektosyne.NetMail ;
 using Tektosyne.Win32Api;
 using Homer;
 
-[assembly: AssemblyTitle("EdSharp")]
-[assembly: AssemblyProduct("EdSharp")]
+[assembly: AssemblyTitle("EdSharpNG")]
+[assembly: AssemblyProduct("EdSharpNG")]
 [assembly: AssemblyVersion("5.0.*")]
-[assembly: AssemblyDescription("EdSharp editor")]
+[assembly: AssemblyDescription("EdSharpNG editor")]
 [assembly: AssemblyCompany("EmpowermentZone.com")]
 [assembly: AssemblyCopyright("Copyright 2007 - 2026 by Jamal Mazrui")]
 [assembly: AssemblyTrademark("")]
@@ -305,10 +305,12 @@ return true;
 } // InitNetSdk method
 
 public static string GetAppName() {
-string sExe = Environment.GetCommandLineArgs()[0];
-string sReturn = Path.GetFileNameWithoutExtension(sExe);
-sReturn = Application.ProductName;
-return sReturn;
+// NOTE: this name drives the config folder, the .ini/.tmp filenames (App.DataDir,
+// GetIniFile, GetTempFile) and the Help .htm lookup. It is deliberately kept as
+// "EdSharp" (NOT the EdSharpNG product/title used for the UI, About and installer)
+// so existing user settings, the shipped EdSharp.ini and EdSharp.htm keep working
+// after the EdSharpNG rebrand. Change only if you also rename those data files.
+return "EdSharp";
 } // GetAppName method
 
 public static string GetProgramDir() {
@@ -1112,7 +1114,7 @@ menuMain.MdiWindowListItem = menuWindow;
 //this.AutoSize = true;
 this.Size = new Size(600, 600);
 this.StartPosition = FormStartPosition.CenterScreen;
-this.Text = "EdSharp";
+this.Text = "EdSharpNG";
 this.ResumeLayout();
 this.KeyPreview = true;
 //this.MdiChildActivate += delegate(object o, EventArgs e) {this.Child = (MdiChild) this.ActiveMdiChild;};
@@ -5711,8 +5713,8 @@ return;
 }
 
 if (menuItem == menuHelpAbout) {
-sText = "EdSharp 5.0 beta\nJune 16, 2026\n\n";
-sText += "Copyright 2007 - 2026 by Jamal Mazrui\nGNU Lesser General Public License (LGPL)\n\n";
+sText = "EdSharpNG 5.0.1 (beta)\nAugust 5, 2026\n\n";
+sText += "Fork of EdSharp by Jamal Mazrui.\nCopyright 2007 - 2026 by Jamal Mazrui\nGNU Lesser General Public License (LGPL)\n\n";
 sText += ".NET Framework " + RuntimeEnvironment.GetSystemVersion() + "\n\n";
 sText += Util.GetPortableExecutableKind();
 Dialog.Show("About", sText);
@@ -9551,7 +9553,7 @@ catch {}
 	bool bWantNoSync = (escMods == Keys.Shift);
 	if (!child.MarkdownReviewMode && !MarkdownReview_IsMarkdownFile(child.File)) return false;
 	if (this.KeyDescriber) {
-	AddMessage(bWantNoSync ? "Toggle detached review mode" : "Toggle review mode");
+	AddMessage(bWantNoSync ? "Toggle detached preview" : "Toggle preview");
 	return true;
 	}
 	MarkdownReview_ToggleCurrent(bWantNoSync);
@@ -9909,6 +9911,15 @@ catch {}
 	return "";
 	} // MarkdownReview_BuildLinkLabelAt method
 
+	private void MarkdownReview_Announce(string sMessage) {
+	// Speak the mode change authoritatively: cancel NVDA's pending speech (the
+	// focus change to/from the preview otherwise queues the control name and
+	// buries our word, which made the direction feel reversed) and force-speak
+	// via the global path so our label is the last, unambiguous thing heard.
+	try {if (Win32.IsNVDAActive()) Win32.NVDACancelSpeech();} catch {}
+	AddMessage(sMessage, true);
+	} // MarkdownReview_Announce method
+
 	private void MarkdownReview_ToggleCurrent(bool bNoSync) {
 	MdiChild child = this.Child;
 	if (child == null) return;
@@ -9951,7 +9962,7 @@ catch {}
 	catch {}
 	child.MarkdownReviewRtbSelectionHandler = null;
 	child.MarkdownReviewNoSync = true;
-	AddMessage("Detached");
+	MarkdownReview_Announce("Detached");
 	}
 	else {
 	// Detached -> synced: reattach the editor->preview sync and align the
@@ -9966,7 +9977,7 @@ catch {}
 	catch {}
 	}
 	try {MarkdownReview_SyncViewToEdit(child);} catch {}
-	AddMessage("Synced");
+	MarkdownReview_Announce("Synced");
 	}
 	} // MarkdownReview_SwitchSyncMode method
 
@@ -9987,7 +9998,7 @@ catch {}
 
 	MarkdownReview_EnsureCache(child);
 	MarkdownReview_ShowView(child);
-	AddMessage(bNoSync ? "Review detached" : "Review");
+	MarkdownReview_Announce(bNoSync ? "Preview detached" : "Preview");
 	} // MarkdownReview_Enter method
 
 	private void MarkdownReview_Exit(MdiChild child) {
@@ -10016,7 +10027,7 @@ catch {}
 	}
 	catch {}
 	}
-	AddMessage("Edit");
+	MarkdownReview_Announce("Editing");
 	} // MarkdownReview_Exit method
 
 	private void MarkdownReview_ShowView(MdiChild child) {

@@ -11,17 +11,17 @@
 ; the ARM64 framework, and HasNgen skips it gracefully if ngen is absent.
 
 [Setup]
-AppName=EdSharp
+AppName=EdSharpNG
 AppVersion=5.0.1
-AppVerName=EdSharp 5.0.1 (beta, Michal build)
+AppVerName=EdSharpNG 5.0.1 (beta)
 VersionInfoVersion=5.0.1
 SetupIconFile=EdSharp.ico
 UninstallDisplayIcon={app}\EdSharp.exe
-AppPublisher=NonvisualDevelopment.org
-AppPublisherURL=https://github.com/JamalMazrui/EdSharp
+AppPublisher=Michal Dziwisz (fork of EdSharp by Jamal Mazrui)
+AppPublisherURL=https://github.com/michaldziwisz/EdSharp
 AppCopyright=Copyright 2006-2026 by Jamal Mazrui
-DefaultDirName={autopf}\EdSharp
-DefaultGroupName=EdSharp
+DefaultDirName={autopf}\EdSharpNG
+DefaultGroupName=EdSharpNG
 ; x64compatible matches both x64 and ARM64 (Inno Setup 6.3+), so the AnyCPU
 ; EdSharp.exe installs and runs natively on both.  MinVersion 10.0 matches the
 ; .NET Framework 4.8 / Windows 10+ requirement.
@@ -30,7 +30,7 @@ ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0
 Compression=lzma2/max
 SolidCompression=yes
-OutputBaseFilename=EdSharp_Setup
+OutputBaseFilename=EdSharpNG_Setup
 OutputDir=C:\EdSharp
 SourceDir=C:\EdSharp
 PrivilegesRequired=admin
@@ -107,13 +107,15 @@ Name: "{userappdata}\EdSharp\Temp";
 ; Alt+Ctrl+E.  (InstallDelete runs before [Icons], so the recreate still wins.)
 Type: files; Name: "{userdesktop}\EdSharp.lnk"
 Type: files; Name: "{commondesktop}\EdSharp.lnk"
+Type: files; Name: "{userdesktop}\EdSharpNG.lnk"
+Type: files; Name: "{commondesktop}\EdSharpNG.lnk"
 
 [Icons]
-Name: "{group}\Launch EdSharp";   Filename: "{app}\EdSharp.exe"; WorkingDir: "{app}"
-Name: "{group}\EdSharp Manual";   Filename: "{app}\EdSharp.htm"
-Name: "{group}\EdSharp Tutorial"; Filename: "{app}\Tutorial.htm"
-Name: "{group}\EdSharp 5.0 beta Announcement"; Filename: "{app}\Announce.htm"
-Name: "{group}\Uninstall EdSharp"; Filename: "{uninstallexe}"
+Name: "{group}\Launch EdSharpNG";   Filename: "{app}\EdSharp.exe"; WorkingDir: "{app}"
+Name: "{group}\EdSharpNG Manual";   Filename: "{app}\EdSharp.htm"
+Name: "{group}\EdSharpNG Tutorial"; Filename: "{app}\Tutorial.htm"
+Name: "{group}\EdSharpNG 5.0.1 Announcement"; Filename: "{app}\Announce.htm"
+Name: "{group}\Uninstall EdSharpNG"; Filename: "{uninstallexe}"
 ; Single hot-key shortcut, following the DbDo model: the one shortcut that owns
 ; Alt+Ctrl+E is created with {autodesktop} (the user desktop for a per-user
 ; install, the common desktop for an all-users install) and HotKey.  No Start
@@ -121,7 +123,7 @@ Name: "{group}\Uninstall EdSharp"; Filename: "{uninstallexe}"
 ; single-instance: OnStartupNextInstance brings the running copy to the
 ; foreground, so a plain relaunch activates rather than starting a second copy
 ; (no -activate parameter is needed, unlike DbDo's dual GUI/CLI shortcut).
-Name: "{autodesktop}\EdSharp"; Filename: "{app}\EdSharp.exe"; WorkingDir: "{app}"; IconFilename: "{app}\EdSharp.ico"; HotKey: Alt+Ctrl+E; Comment: "Launch or activate EdSharp 5.0 (Alt+Control+E)"
+Name: "{autodesktop}\EdSharpNG"; Filename: "{app}\EdSharp.exe"; WorkingDir: "{app}"; IconFilename: "{app}\EdSharp.ico"; HotKey: Alt+Ctrl+E; Comment: "Launch or activate EdSharpNG 5.0.1 (Alt+Control+E)"
 
 [Run]
 ; Install EdSharps JAWS scripts (Finish-page option, like DbDo). Delegates to
