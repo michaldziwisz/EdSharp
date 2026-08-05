@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>EdSharpNG Spelling Errors (NVDA add-on)</title>
+</head>
+<body>
+<h1>EdSharpNG Spelling Errors</h1>
+<p>This NVDA add-on makes NVDA announce spelling errors in the EdSharpNG editor,
+the same way it does natively in Microsoft Word or the browser.</p>
+<h2>What it does</h2>
+<p>While EdSharpNG is the foreground application, the add-on checks the text of
+the editor control with the Windows Spell Checking API and marks misspelled
+words with NVDA's <code>invalid-spelling</code> attribute. As you read or move
+through the document, NVDA signals words it considers misspelled, using your
+Windows spell-check language.</p>
+<h2>Notes</h2>
+<ul>
+<li>It works on EdSharpNG's editor (a WinForms rich-text control); no EdSharpNG
+setting is required.</li>
+<li>It is independent of any built-in spell command: EdSharpNG itself no longer
+carries a Spell Check menu item, so this add-on is the spelling-feedback path.</li>
+<li>The spelling language follows Windows' configured spell-checking languages.</li>
+</ul>
+<h2>After installing</h2>
+<p>Restart NVDA for the add-on to take effect. To confirm it is active, set
+NVDA's log level to Debug, open EdSharpNG, and look for an
+<code>EdSharpNG spellcheck:</code> entry in NVDA's log.</p>
+</body>
+</html>

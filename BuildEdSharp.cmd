@@ -5,7 +5,7 @@ rem
 rem   1. EdSharp.dll -- JScript .NET scripting host, from EdSharp.js by
 rem      jsc.exe. Loaded at run time by reflection (Assembly.LoadFrom),
 rem      so csc.exe does NOT /reference it (same base name as the exe).
-rem   2. EdSharp.exe -- the WinForms app, from EdSharp.cs by csc.exe,
+rem   2. EdSharpNG.exe -- the WinForms app, from EdSharp.cs by csc.exe,
 rem      x64, with the manifest and (if present) icon.
 rem
 rem Bare compilers, no MSBuild/NuGet: jsc.exe and csc.exe both ship with
@@ -98,12 +98,12 @@ if exist "Ude.dll" set "udeRef=/reference:Ude.dll"
 if exist "Ude.dll" set "udeDef=/define:HAVEUDE"
 if exist "Ude.dll" (echo Ude.dll present - content encoding detection enabled. >> "!log!") else (echo Ude.dll absent - BOM detection + UTF-8-BOM default only. >> "!log!")
 
-rem ---- compile EdSharp.cs -> EdSharp.exe (x64) ----
-echo Compiling EdSharp.cs -^> EdSharp.exe ...
-if exist EdSharp.exe del /f /q EdSharp.exe
+rem ---- compile EdSharp.cs -> EdSharpNG.exe (x64) ----
+echo Compiling EdSharp.cs -^> EdSharpNG.exe ...
+if exist EdSharpNG.exe del /f /q EdSharpNG.exe
 set "icon="
 if exist EdSharp.ico set "icon=/win32icon:EdSharp.ico"
-"!csc!" /nologo /target:winexe /platform:anycpu /optimize+ !udeDef! %icon% /win32manifest:EdSharp.manifest /reference:"Tektosyne.dll" /reference:"Microsoft.VisualBasic.dll" /reference:"Microsoft.CSharp.dll" /reference:"!uiaProv!" /reference:"!uiaTypes!" !udeRef! /out:EdSharp.exe EdSharp.cs Lbc.cs Say.cs Inix.cs KeyMap.cs Web.cs >> "!log!" 2>&1
+"!csc!" /nologo /target:winexe /platform:anycpu /optimize+ !udeDef! %icon% /win32manifest:EdSharp.manifest /reference:"Tektosyne.dll" /reference:"Microsoft.VisualBasic.dll" /reference:"Microsoft.CSharp.dll" /reference:"!uiaProv!" /reference:"!uiaTypes!" !udeRef! /out:EdSharpNG.exe EdSharp.cs Lbc.cs Say.cs Inix.cs KeyMap.cs Web.cs >> "!log!" 2>&1
 if errorlevel 1 goto failed
 
 rem ---- native pre-JIT (ngen) is handled by the INSTALLER, not here ----
@@ -125,10 +125,10 @@ if exist "FetchConvertTools.ps1" (
 
 echo.
 echo Build complete:
-echo   EdSharp.exe  -- the application (x64)
+echo   EdSharpNG.exe  -- the application (x64)
 echo   EdSharp.dll  -- JScript .NET scripting host
 echo. >> "!log!"
-echo BUILD COMPLETE: EdSharp.exe and EdSharp.dll built successfully. >> "!log!"
+echo BUILD COMPLETE: EdSharpNG.exe and EdSharp.dll built successfully. >> "!log!"
 echo Finished %DATE% %TIME% >> "!log!"
 popd & endlocal & exit /b 0
 

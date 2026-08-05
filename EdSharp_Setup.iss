@@ -16,7 +16,7 @@ AppVersion=5.0.1
 AppVerName=EdSharpNG 5.0.1 (beta)
 VersionInfoVersion=5.0.1
 SetupIconFile=EdSharp.ico
-UninstallDisplayIcon={app}\EdSharp.exe
+UninstallDisplayIcon={app}\EdSharpNG.exe
 AppPublisher=Michal Dziwisz (fork of EdSharp by Jamal Mazrui)
 AppPublisherURL=https://github.com/michaldziwisz/EdSharp
 AppCopyright=Copyright 2006-2026 by Jamal Mazrui
@@ -43,12 +43,12 @@ SetupLogging=yes
 
 [Files]
 ; Built artifacts (present after BuildEdSharp.cmd).
-Source: "EdSharp.exe";        DestDir: "{app}"; Flags: ignoreversion
-; Runtime configuration for EdSharp.exe -- carries the startup tuning (disables
+Source: "EdSharpNG.exe";        DestDir: "{app}"; Flags: ignoreversion
+; Runtime configuration for EdSharpNG.exe -- carries the startup tuning (disables
 ; Authenticode publisher-evidence/CRL checks, enables concurrent GC).  It must
-; sit next to EdSharp.exe, and ignoreversion ensures it is always refreshed so
+; sit next to EdSharpNG.exe, and ignoreversion ensures it is always refreshed so
 ; it stays in sync with the executable.
-Source: "EdSharp.exe.config"; DestDir: "{app}"; Flags: ignoreversion
+Source: "EdSharpNG.exe.config"; DestDir: "{app}"; Flags: ignoreversion
 Source: "EdSharp.dll";        DestDir: "{app}"; Flags: ignoreversion
 Source: "nvdaControllerClient.dll"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 ; Source and build inputs (shipped so users can recompile, EdSharp-style).
@@ -71,8 +71,9 @@ Source: "Tektosyne.dll";      DestDir: "{app}"; Flags: ignoreversion
 Source: "Ude.dll";            DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 ; JAWS settings family (compiled into each installed JAWS version by [Code]).
 Source: "Scripts\*";        DestDir: "{app}\Scripts"; Flags: ignoreversion recursesubdirs skipifsourcedoesntexist
-; NVDA add-on (installed on the Finish page via [Run]).
+; NVDA add-ons (installed on the Finish page via [Run]).
 Source: "EdSharp.nvda-addon"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "EdSharpNG-spellcheck.nvda-addon"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 ; Configuration: do not clobber a user's existing settings on upgrade.
 Source: "EdSharp.ini";        DestDir: "{app}"; Flags: onlyifdoesntexist
 Source: "Hotkeys.ini";        DestDir: "{app}"; Flags: onlyifdoesntexist
@@ -111,7 +112,7 @@ Type: files; Name: "{userdesktop}\EdSharpNG.lnk"
 Type: files; Name: "{commondesktop}\EdSharpNG.lnk"
 
 [Icons]
-Name: "{group}\Launch EdSharpNG";   Filename: "{app}\EdSharp.exe"; WorkingDir: "{app}"
+Name: "{group}\Launch EdSharpNG";   Filename: "{app}\EdSharpNG.exe"; WorkingDir: "{app}"
 Name: "{group}\EdSharpNG Manual";   Filename: "{app}\EdSharp.htm"
 Name: "{group}\EdSharpNG Tutorial"; Filename: "{app}\Tutorial.htm"
 Name: "{group}\EdSharpNG 5.0.1 Announcement"; Filename: "{app}\Announce.htm"
@@ -121,31 +122,35 @@ Name: "{group}\Uninstall EdSharpNG"; Filename: "{uninstallexe}"
 ; AltGr as Ctrl+Alt, so the hot key would swallow that character system-wide.
 ; EdSharpNG is single-instance (OnStartupNextInstance brings the running copy to
 ; the foreground), so launching from the shortcut still just activates it.
-Name: "{autodesktop}\EdSharpNG"; Filename: "{app}\EdSharp.exe"; WorkingDir: "{app}"; IconFilename: "{app}\EdSharp.ico"; Comment: "Launch or activate EdSharpNG 5.0.1"
+Name: "{autodesktop}\EdSharpNG"; Filename: "{app}\EdSharpNG.exe"; WorkingDir: "{app}"; IconFilename: "{app}\EdSharp.ico"; Comment: "Launch or activate EdSharpNG 5.0.1"
 
 [Run]
 ; Install EdSharps JAWS scripts (Finish-page option, like DbDo). Delegates to
 ; EdSharp.exe --install-jaws-settings, whose C# implementation copies the
 ; settings family into every installed JAWS version and compiles them there.
-Filename: "{app}\EdSharp.exe"; Parameters: "--install-jaws-settings"; WorkingDir: "{app}"; Description: "Install JAWS scripts for EdSharp (recommended if you use JAWS)"; Flags: postinstall skipifsilent
+Filename: "{app}\EdSharpNG.exe"; Parameters: "--install-jaws-settings"; WorkingDir: "{app}"; Description: "Install JAWS scripts for EdSharpNG (recommended if you use JAWS)"; Flags: postinstall skipifsilent
 ; Install the NVDA add-on by shell-executing the .nvda-addon file (NVDA
 ; registers itself as the handler). Unchecked by default; checking it opens
 ; NVDA's add-on install dialog. NVDA must be running, and be restarted after.
 Filename: "{app}\EdSharp.nvda-addon"; Description: "Install NVDA add-on (NVDA must be running; restart NVDA afterward)"; Flags: postinstall shellexec skipifdoesntexist unchecked
+; Install the EdSharpNG spelling-errors NVDA add-on (announces misspellings in
+; the editor via the Windows Spell Checking API). Same mechanism: shell-execute
+; the .nvda-addon so NVDA installs it. Unchecked by default; NVDA must be running.
+Filename: "{app}\EdSharpNG-spellcheck.nvda-addon"; Description: "Install NVDA spelling-errors add-on for EdSharpNG (NVDA must be running; restart NVDA afterward)"; Flags: postinstall shellexec skipifdoesntexist unchecked
 ; Pre-generate native images for faster startup (64-bit ngen).
 Filename: "{code:NgenExe}"; Parameters: "uninstall EdSharp /nologo /silent"; Flags: runhidden; Check: HasNgen
-Filename: "{code:NgenExe}"; Parameters: "install ""{app}\EdSharp.exe"" /AppBase:""{app}"" /nologo /silent"; Flags: runhidden; Check: HasNgen
+Filename: "{code:NgenExe}"; Parameters: "install ""{app}\EdSharpNG.exe"" /AppBase:""{app}"" /nologo /silent"; Flags: runhidden; Check: HasNgen
 
 [UninstallRun]
 Filename: "{code:NgenExe}"; Parameters: "uninstall EdSharp /nologo /silent"; Flags: runhidden; Check: HasNgen
 
 [UninstallDelete]
-Type: files; Name: "{app}\EdSharp.exe"
+Type: files; Name: "{app}\EdSharpNG.exe"
 Type: files; Name: "{app}\EdSharp.dll"
 Type: files; Name: "{app}\BuildEdSharp.log"
 
 [Registry]
-Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\EdSharp.exe"; ValueType: string; ValueName: ""; ValueData: "{app}\EdSharp.exe"; Flags: uninsdeletekey
+Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\EdSharpNG.exe"; ValueType: string; ValueName: ""; ValueData: "{app}\EdSharpNG.exe"; Flags: uninsdeletekey
 
 [Code]
 function NgenExe(sParam: string): string;

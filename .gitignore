@@ -36,3 +36,5 @@ dist/
 EdSharp_Setup.exe
 EdSharp_setup.exe
 *.xlsx
+EdSharpNG.exe
+EdSharpNG-spellcheck.nvda-addon
