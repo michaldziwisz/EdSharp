@@ -1116,6 +1116,27 @@ this.Text = "EdSharp";
 this.ResumeLayout();
 this.KeyPreview = true;
 //this.MdiChildActivate += delegate(object o, EventArgs e) {this.Child = (MdiChild) this.ActiveMdiChild;};
+// When the app regains activation (e.g. via Alt+Tab), Windows/MDI often
+// leaves keyboard focus on the child form or MDI client rather than the
+// actual edit control, so the screen reader loses the caret until the user
+// re-enters the window or toggles preview (double Escape). Force focus back
+// onto the active child's real edit control. BeginInvoke defers this until
+// after Windows finishes its own activation focus handling, so we do not
+// fight it (setting focus synchronously inside Activated is unreliable).
+this.Activated += delegate(object o, EventArgs e) {
+try {
+this.BeginInvoke((MethodInvoker) delegate {
+try {
+MdiChild child = this.Child;
+if (child == null || child.IsDisposed) return;
+if (child.MarkdownReviewMode && child.MarkdownReviewView != null && !child.MarkdownReviewView.IsDisposed) child.MarkdownReviewView.Focus();
+else if (child.RTB != null && !child.RTB.IsDisposed) child.RTB.Focus();
+}
+catch {}
+});
+}
+catch {}
+};
 string s = App.ReadOption("MaximizeWindow", "N").Trim().ToUpper();
 if (s == "Y" || s == "YES") this.Shown += delegate(object o, EventArgs e) {
 this.WindowState = FormWindowState.Maximized;
