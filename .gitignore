@@ -30,3 +30,9 @@ Ude.dll
 temp.txt
 temp.htm
 *.tmp
+
+# Artefakty wydania (budowane lokalnie, nie wersjonowane)
+dist/
+EdSharp_Setup.exe
+EdSharp_setup.exe
+*.xlsx
