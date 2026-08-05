@@ -473,6 +473,13 @@ public string LastClipboardText = "";
 	public int MarkdownReviewLastLinkRowStart = -1;
 	public bool MarkdownReviewAnnounceHeading = false;
 	public int MarkdownReviewViewRevision = -1;
+	// When true, the preview is "detached": caret changes in the preview are
+	// NOT synced back to the editor, and on leaving the preview the editor
+	// caret is restored to where it was when the detached preview was entered.
+	// Toggled with Shift+Escape (plain Escape uses the synced mode).
+	public bool MarkdownReviewNoSync = false;
+	public int MarkdownReviewSavedEditPos = -1;
+	public int MarkdownReviewSavedEditLength = 0;
 private string sFile = "";
 public string File {
 get {
@@ -9516,14 +9523,17 @@ catch {}
 
 	MdiChild child = this.Child;
 
-	if (keyData == Keys.Escape) {
+	Keys escCode = keyData & Keys.KeyCode;
+	Keys escMods = keyData & (Keys.Control | Keys.Shift | Keys.Alt);
+	if (escCode == Keys.Escape && (escMods == Keys.None || escMods == Keys.Shift)) {
 	if (child == null) return false;
+	bool bWantNoSync = (escMods == Keys.Shift);
 	if (!child.MarkdownReviewMode && !MarkdownReview_IsMarkdownFile(child.File)) return false;
 	if (this.KeyDescriber) {
-	AddMessage("Toggle review mode");
+	AddMessage(bWantNoSync ? "Toggle detached review mode" : "Toggle review mode");
 	return true;
 	}
-	MarkdownReview_ToggleCurrent();
+	MarkdownReview_ToggleCurrent(bWantNoSync);
 	return true;
 	}
 
@@ -9878,12 +9888,21 @@ catch {}
 	return "";
 	} // MarkdownReview_BuildLinkLabelAt method
 
-	private void MarkdownReview_ToggleCurrent() {
+	private void MarkdownReview_ToggleCurrent(bool bNoSync) {
 	MdiChild child = this.Child;
 	if (child == null) return;
 
 	if (child.MarkdownReviewMode) {
+	// Already previewing. If the requested mode matches the current one,
+	// this keystroke means "go back to editing". If it differs, switch the
+	// sync mode in place (Michal's safeguard: Shift+Esc while in a synced
+	// preview flips it to detached, and vice versa, without leaving preview).
+	if (child.MarkdownReviewNoSync == bNoSync) {
 	MarkdownReview_Exit(child);
+	}
+	else {
+	MarkdownReview_SwitchSyncMode(child, bNoSync);
+	}
 	return;
 	}
 
@@ -9892,16 +9911,54 @@ catch {}
 	return;
 	}
 
-	MarkdownReview_Enter(child);
+	MarkdownReview_Enter(child, bNoSync);
 	} // MarkdownReview_ToggleCurrent method
 
-	private void MarkdownReview_Enter(MdiChild child) {
+	private void MarkdownReview_SwitchSyncMode(MdiChild child, bool bNoSync) {
+	if (child == null) return;
+	HomerRichTextBox rtb = child.RTB;
+	if (rtb == null) return;
+
+	if (bNoSync) {
+	// Synced -> detached: remember where editing was and stop syncing the
+	// editor caret to the preview caret.
+	child.MarkdownReviewSavedEditPos = rtb.SelectionStart;
+	child.MarkdownReviewSavedEditLength = rtb.SelectionLength;
+	try {
+	if (child.MarkdownReviewRtbSelectionHandler != null) rtb.SelectionChanged -= child.MarkdownReviewRtbSelectionHandler;
+	}
+	catch {}
+	child.MarkdownReviewRtbSelectionHandler = null;
+	child.MarkdownReviewNoSync = true;
+	AddMessage("Detached");
+	}
+	else {
+	// Detached -> synced: reattach the editor->preview sync and align the
+	// preview to the current editor caret.
+	child.MarkdownReviewNoSync = false;
+	if (child.MarkdownReviewRtbSelectionHandler == null) {
+	try {
+	EventHandler eh = delegate(object o, EventArgs e) {MarkdownReview_SyncViewToEdit(child);};
+	child.MarkdownReviewRtbSelectionHandler = eh;
+	rtb.SelectionChanged += eh;
+	}
+	catch {}
+	}
+	try {MarkdownReview_SyncViewToEdit(child);} catch {}
+	AddMessage("Synced");
+	}
+	} // MarkdownReview_SwitchSyncMode method
+
+	private void MarkdownReview_Enter(MdiChild child, bool bNoSync) {
 	if (child == null) return;
 	HomerRichTextBox rtb = child.RTB;
 	if (rtb == null) return;
 
 		child.MarkdownReviewOldGuard = rtb.ReadOnly;
 			child.MarkdownReviewMode = true;
+			child.MarkdownReviewNoSync = bNoSync;
+			child.MarkdownReviewSavedEditPos = rtb.SelectionStart;
+			child.MarkdownReviewSavedEditLength = rtb.SelectionLength;
 			child.MarkdownReviewLastHeadingRowStart = -1;
 			child.MarkdownReviewLastLinkRowStart = -1;
 			child.MarkdownReviewAnnounceHeading = false;
@@ -9909,7 +9966,7 @@ catch {}
 
 	MarkdownReview_EnsureCache(child);
 	MarkdownReview_ShowView(child);
-	AddMessage("Review");
+	AddMessage(bNoSync ? "Review detached" : "Review");
 	} // MarkdownReview_Enter method
 
 	private void MarkdownReview_Exit(MdiChild child) {
@@ -9917,9 +9974,27 @@ catch {}
 	HomerRichTextBox rtb = child.RTB;
 	if (rtb == null) return;
 
+	bool bRestore = child.MarkdownReviewNoSync;
+	int iRestorePos = child.MarkdownReviewSavedEditPos;
+	int iRestoreLen = child.MarkdownReviewSavedEditLength;
+
 	MarkdownReview_HideView(child);
 	child.MarkdownReviewMode = false;
+	child.MarkdownReviewNoSync = false;
 	rtb.SetGuard(child.MarkdownReviewOldGuard);
+
+	// Detached preview: return the caret to where editing was when the
+	// detached preview was entered, regardless of where the user browsed.
+	if (bRestore && iRestorePos >= 0) {
+	try {
+	int iMax = rtb.TextLength;
+	int iPos = iRestorePos; if (iPos > iMax) iPos = iMax;
+	int iLen = iRestoreLen; if (iPos + iLen > iMax) iLen = iMax - iPos;
+	rtb.Select(iPos, iLen < 0 ? 0 : iLen);
+	rtb.ScrollToCaret();
+	}
+	catch {}
+	}
 	AddMessage("Edit");
 	} // MarkdownReview_Exit method
 
@@ -9949,7 +10024,7 @@ catch {}
 		try {child.MarkdownReviewView.Visible = true;} catch {}
 		}
 
-		if (child.MarkdownReviewRtbSelectionHandler == null) {
+		if (child.MarkdownReviewRtbSelectionHandler == null && !child.MarkdownReviewNoSync) {
 		try {
 		EventHandler eh = delegate(object o, EventArgs e) {MarkdownReview_SyncViewToEdit(child);};
 		child.MarkdownReviewRtbSelectionHandler = eh;
@@ -9992,6 +10067,7 @@ catch {}
 	private void MarkdownReview_SyncFromView(MdiChild child) {
 	if (child == null) return;
 	if (child.MarkdownReviewSync) return;
+	if (child.MarkdownReviewNoSync) return;
 	if (!child.MarkdownReviewMode) return;
 	if (child.MarkdownReviewView == null) return;
 	HomerRichTextBox rtb = child.RTB;
