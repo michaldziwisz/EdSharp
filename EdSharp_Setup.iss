@@ -116,14 +116,12 @@ Name: "{group}\EdSharpNG Manual";   Filename: "{app}\EdSharp.htm"
 Name: "{group}\EdSharpNG Tutorial"; Filename: "{app}\Tutorial.htm"
 Name: "{group}\EdSharpNG 5.0.1 Announcement"; Filename: "{app}\Announce.htm"
 Name: "{group}\Uninstall EdSharpNG"; Filename: "{uninstallexe}"
-; Single hot-key shortcut, following the DbDo model: the one shortcut that owns
-; Alt+Ctrl+E is created with {autodesktop} (the user desktop for a per-user
-; install, the common desktop for an all-users install) and HotKey.  No Start
-; Menu item carries a hot key, so Alt+Ctrl+E has exactly one owner.  EdSharp is
-; single-instance: OnStartupNextInstance brings the running copy to the
-; foreground, so a plain relaunch activates rather than starting a second copy
-; (no -activate parameter is needed, unlike DbDo's dual GUI/CLI shortcut).
-Name: "{autodesktop}\EdSharpNG"; Filename: "{app}\EdSharp.exe"; WorkingDir: "{app}"; IconFilename: "{app}\EdSharp.ico"; HotKey: Alt+Ctrl+E; Comment: "Launch or activate EdSharpNG 5.0.1 (Alt+Control+E)"
+; Desktop shortcut WITHOUT a global hot key: Alt+Ctrl+E was dropped because on a
+; Polish keyboard AltGr+E types the letter e-ogonek (e with tail) and Windows maps
+; AltGr as Ctrl+Alt, so the hot key would swallow that character system-wide.
+; EdSharpNG is single-instance (OnStartupNextInstance brings the running copy to
+; the foreground), so launching from the shortcut still just activates it.
+Name: "{autodesktop}\EdSharpNG"; Filename: "{app}\EdSharp.exe"; WorkingDir: "{app}"; IconFilename: "{app}\EdSharp.ico"; Comment: "Launch or activate EdSharpNG 5.0.1"
 
 [Run]
 ; Install EdSharps JAWS scripts (Finish-page option, like DbDo). Delegates to
