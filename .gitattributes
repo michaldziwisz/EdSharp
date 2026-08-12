@@ -3,6 +3,10 @@
 # mark binary assets so git never tries to normalize them.
 * text=auto eol=crlf
 
+# Skrypty wykonywane przez WSL/Linux MUSZA zostac LF; CRLF psuje shebang
+# interpretera. Wyjatek dodany dla build_installer_garfield.sh.
+*.sh text eol=lf
+
 *.ico binary
 *.dll binary
 *.exe binary
