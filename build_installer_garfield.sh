@@ -36,7 +36,7 @@ if [[ ! -x "$ISCC" ]]; then
 fi
 
 cd "$ROOT"
-echo "[1/5] Budowa EdSharpNG.exe i EdSharp.dll..."
+echo "[1/6] Budowa EdSharpNG.exe i EdSharp.dll..."
 /mnt/c/Windows/System32/cmd.exe /c BuildEdSharp.cmd
 if grep -aEq 'error (CS|JS)[0-9]+' "$LOG_BUILD"; then
     echo "BLAD kompilacji - patrz $LOG_BUILD" >&2
@@ -55,7 +55,29 @@ if [[ -e "$OUT" ]]; then
     exit 1
 fi
 
-echo "[2/5] Staging do C:\\EdSharp (SourceDir zaszyty w .iss)..."
+echo "[2/6] Budowa dodatku NVDA ze sprawdzaniem pisowni..."
+ADDON_SRC="$ROOT/NVDAAddon/edsharpng-spellcheck"
+ADDON_OUT="$ROOT/EdSharpNG-spellcheck.nvda-addon"
+[[ -f "$ADDON_SRC/manifest.ini" && -f "$ADDON_SRC/readme.html" \
+   && -f "$ADDON_SRC/appModules/edsharpng.py" ]] || {
+    echo "BLAD: niekompletne zrodla dodatku NVDA w $ADDON_SRC" >&2
+    exit 1
+}
+rm -f "$ADDON_OUT"
+(
+    cd "$ADDON_SRC"
+    zip -q -r "$ADDON_OUT" manifest.ini readme.html appModules \
+        -x '*/__pycache__/*' '*.pyc'
+)
+# Minimalna kontrola struktury dodatku - te trzy pliki sa wymagane przez NVDA.
+for rel in manifest.ini readme.html appModules/edsharpng.py; do
+    unzip -Z1 "$ADDON_OUT" | grep -Fxq "$rel" || {
+        echo "BLAD: dodatek NVDA nie zawiera $rel" >&2
+        exit 1
+    }
+done
+
+echo "[3/6] Staging do C:\\EdSharp (SourceDir zaszyty w .iss)..."
 rm -rf "$STAGE"
 mkdir -p "$STAGE"
 # Kopiujemy sledzone pliki, zeby staging nie dostal .git, logow ani starych buildow.
@@ -66,7 +88,7 @@ while IFS= read -r -d '' rel; do
     cp -a "$src" "$dst"
 done < <(git ls-files -z)
 # Artefakty buildu sa ignorowane, ale wymagane przez instalator.
-cp -a EdSharpNG.exe EdSharp.dll "$STAGE/"
+cp -a EdSharpNG.exe EdSharp.dll EdSharpNG-spellcheck.nvda-addon "$STAGE/"
 # Zasoby pobrane best-effort przez BuildEdSharp.cmd (ignorowane przez git).
 for rel in Ude.dll Convert; do
     [[ -e "$ROOT/$rel" ]] && cp -a "$ROOT/$rel" "$STAGE/"
@@ -85,7 +107,7 @@ for key in (b'AppVersion', b'VersionInfoVersion'):
 open(path, 'wb').write(raw)
 PY
 
-echo "[3/5] Kontrola wymaganych plikow instalatora..."
+echo "[4/6] Kontrola wymaganych plikow instalatora..."
 python3 - "$STAGE" <<'PY'
 import os, re, sys
 stage = sys.argv[1]
@@ -107,8 +129,16 @@ if missing:
     raise SystemExit('BLAD: brak wymaganych plikow: ' + ', '.join(missing))
 print('Wszystkie wymagane pliki sa obecne.')
 PY
+# Ten addon jest oznaczony w .iss jako opcjonalny (dla zgodnosci z wersja
+# upstream), ale w NASZYM EdSharpNG jest funkcja produktu - pipeline traktuje
+# go jako wymagany. Bez tego ISCC konczy sukcesem i cicho buduje wybrakowany
+# instalator (znalezione pomiarem na pierwszym buildzie Garfielda 5.0.3).
+[[ -s "$STAGE/EdSharpNG-spellcheck.nvda-addon" ]] || {
+    echo "BLAD: brak wymaganego dodatku EdSharpNG-spellcheck.nvda-addon w stagingu" >&2
+    exit 1
+}
 
-echo "[4/5] Kompilacja instalatora Inno Setup $VERSION..."
+echo "[5/6] Kompilacja instalatora Inno Setup $VERSION..."
 "$ISCC" 'C:\EdSharp\EdSharp_Setup.iss' >"$LOG_ISCC" 2>&1
 if ! grep -q 'Successful compile' "$LOG_ISCC"; then
     echo "BLAD Inno Setup - patrz $LOG_ISCC" >&2
@@ -119,7 +149,7 @@ fi
 mkdir -p "$ROOT/dist"
 cp -a "$STAGE/EdSharpNG_Setup.exe" "$OUT"
 
-echo "[5/5] Weryfikacja swiezosci i tozsamosci binarki..."
+echo "[6/6] Weryfikacja swiezosci i tozsamosci binarki..."
 cmp -s "$ROOT/EdSharpNG.exe" "$STAGE/EdSharpNG.exe" || {
     echo "BLAD: staging zawiera inna binarke niz swiezy build" >&2
     exit 1
