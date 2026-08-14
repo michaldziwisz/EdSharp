@@ -184,6 +184,8 @@ Rename=Alt+Shift+R, Rename current file on disk
 
 Next Section=Control+PageDown, Go to the next Markdown heading of any level
 Prior Section=Control+PageUp, Go to the previous Markdown heading of any level
+Next Section at Same Level=Control+Shift+PageDown, Go to the next Markdown heading of the same level, skipping subsections
+Prior Section at Same Level=Control+Shift+PageUp, Go to the previous Markdown heading of the same level, skipping subsections
 Go to Section=F6, Go to section in body from topic in table of contents
 Go to Contents=Shift+F6, Go to topic in table of contents from section in body
 Search for Topic=Control+F6, Search for a topic based on text in its heading

@@ -845,7 +845,7 @@ public MenuStrip menuMain;
 public ToolStripMenuItem menuFile, menuFileNew, menuFileNewFromClipboard, menuFileOpen, menuFileOpenOtherFormat, menuFileOpenAgain, menuFileRecent, menuFileSetFavorite, menuFileClearFavorite, menuFileListFavorites, menuFileFind, menuFileSave, menuFileSaveAs, menuFileSaveCopy, menuFileExport, menuFileRename, menuFileProperties, menuFileMailBody, menuFileMailAttach, menuFilePrint, menuFileRun, menuFileCurrentWindows, menuFileClose, menuFileCloseAllButCurrentWindow, menuFileSlots, menuFileExit;
 public ToolStripMenuItem menuEdit, menuEditSelectAll, menuEditUnselectAll, menuEditCopy, menuEditCopyAppend, menuEditCopyRichText, menuEditCut, menuEditCutAppend, menuEditPaste, menuEditPasteFile, menuEditUndo, menuEditRedo, menuEditStartSelection, menuEditCompleteSelection, menuEditReselect, menuEditCopyAll, menuEditSelectChunk, menuEditAppendFromClipboard, menuEditQuote, menuEditUnquote, menuEditUpperCase, menuEditLowerCase, menuEditProperCase, menuEditSwapCase, menuEditYieldEncoding, menuEditJoinLines, menuEditHardLineBreak, menuEditEnterNewLine, menuEditIndentNewLine, menuEditIndentNewLinePrior, menuEditIndent, menuEditOutdent, menuEditAlign, menuEditIndentMode, menuEditJustify, menuEditStyle, menuEditBaseline, menuEditSetSelectionFont;
 public ToolStripMenuItem menuDelete, menuDeleteReplaceRegular, menuDeleteReplaceWithRegExp, menuDeleteHardLine, menuDeleteParagraph, menuDeleteLine, menuDeleteRight, menuDeleteLeft, menuDeleteDown, menuDeleteUp, menuDeleteFile, menuDeleteTrimBlanks;
-public ToolStripMenuItem menuNavigate, menuNavigateForwardFind, menuNavigateReverseFind, menuNavigateForwardFindWithRegExp, menuNavigateReverseFindWithRegExp,  menuNavigateForwardFindAtCursor, menuNavigateReverseFindAtCursor, menuNavigateForwardFindAgain, menuNavigateReverseFindAgain, menuNavigateJumpToLine, menuNavigateJumpToLineAgain, menuNavigateGoToPercent, menuNavigateGoToPercentAgain, menuNavigateGoToPart, menuNavigateSetBookmark, menuNavigateClearBookmark, menuNavigateGoToBookmark, menuNavigateHomeCharacter, menuNavigateEndCharacter, menuNavigateStartTag, menuNavigateEndTag,  menuNavigateNextJustify, menuNavigatePriorJustify, menuNavigateNextStyle, menuNavigatePriorStyle, menuNavigateNextBaseline, menuNavigatePriorBaseline, menuNavigateNextFont, menuNavigatePriorFont, menuNavigateRightBrace, menuNavigateNextBlock, menuNavigatePriorBlock, menuNavigateLeftBrace, menuNavigateNextIndent, menuNavigatePriorIndent, menuNavigateNextChunk,  menuNavigatePriorChunk, menuNavigateNextSentence, menuNavigatePriorSentence, menuNavigateNextParagraph, menuNavigatePriorParagraph, menuNavigateNextPart, menuNavigatePriorPart, menuNavigateNextSection, menuNavigatePriorSection, menuNavigateGoToSection, menuNavigateGoToContents, menuNavigateSearchForTopic, menuNavigateSearchForTopicAgain, menuNavigateGoToStartOfSelection, menuNavigateNextBookmark, menuNavigatePriorBookmark;
+public ToolStripMenuItem menuNavigate, menuNavigateForwardFind, menuNavigateReverseFind, menuNavigateForwardFindWithRegExp, menuNavigateReverseFindWithRegExp,  menuNavigateForwardFindAtCursor, menuNavigateReverseFindAtCursor, menuNavigateForwardFindAgain, menuNavigateReverseFindAgain, menuNavigateJumpToLine, menuNavigateJumpToLineAgain, menuNavigateGoToPercent, menuNavigateGoToPercentAgain, menuNavigateGoToPart, menuNavigateSetBookmark, menuNavigateClearBookmark, menuNavigateGoToBookmark, menuNavigateHomeCharacter, menuNavigateEndCharacter, menuNavigateStartTag, menuNavigateEndTag,  menuNavigateNextJustify, menuNavigatePriorJustify, menuNavigateNextStyle, menuNavigatePriorStyle, menuNavigateNextBaseline, menuNavigatePriorBaseline, menuNavigateNextFont, menuNavigatePriorFont, menuNavigateRightBrace, menuNavigateNextBlock, menuNavigatePriorBlock, menuNavigateLeftBrace, menuNavigateNextIndent, menuNavigatePriorIndent, menuNavigateNextChunk,  menuNavigatePriorChunk, menuNavigateNextSentence, menuNavigatePriorSentence, menuNavigateNextParagraph, menuNavigatePriorParagraph, menuNavigateNextPart, menuNavigatePriorPart, menuNavigateNextSection, menuNavigatePriorSection, menuNavigateNextSectionSameLevel, menuNavigatePriorSectionSameLevel, menuNavigateGoToSection, menuNavigateGoToContents, menuNavigateSearchForTopic, menuNavigateSearchForTopicAgain, menuNavigateGoToStartOfSelection, menuNavigateNextBookmark, menuNavigatePriorBookmark;
 public ToolStripMenuItem menuQuery, menuQueryAddress, menuQueryBraces, menuQueryBlock, menuQueryIndent, menuQueryPath, menuQueryTopic, menuQueryYield, menuQueryStatus, menuQueryCompiler, menuQuerySelected, menuQueryChunk, menuQueryReadAll, menuQueryWindowsOpen, menuQueryClipboard, menuQueryTime, menuQueryStyles, menuQueryFont;
 public ToolStripMenuItem menuMisc, menuMiscSetDefaultFont, menuMiscConfigurationOptions, menuMiscManualOptions, menuMiscResetConfiguration, menuMiscGoToFolder, menuMiscGoToSpecialFolder, menuMiscWordWrap, menuMiscUnwrap, menuMiscExtraSpeechToggle, menuMiscExtraSpeechLog, menuMiscEnvironmentVariables, menuMiscSpellCheck, menuMiscThesaurus, menuMiscLookupTerm, menuMiscTranslateLanguage, menuMiscGuardDocument, menuMiscNoGuard, menuMiscPyBrace, menuMiscPyDent, menuMiscInferIndent, menuMiscFormatCode, menuMiscRepeatLine, menuMiscSectionBreak, menuMiscPathToClipboard, menuMiscPathList, menuMiscInsertTime, menuMiscCalculateDate, menuMiscTextConvert, menuMiscTextCombine, menuMiscTextContents, menuMiscYieldWithRegExp, menuMiscExtractWithRegExp, menuMiscRunAtCursor, menuMiscSpecialCharacter, menuMiscEvaluateExpression, menuMiscReplaceTokens, menuMiscTransformFiles, menuMiscGoToEnvironment, menuMiscCompile, menuMiscPickCompiler, menuMiscPromptCommand, menuMiscReviewOutput, menuMiscSaveSnippet, menuMiscInvokeSnippet, menuMiscViewSnippet, menuMiscKeepUniqueItems, menuMiscNumberItems, menuMiscOrderItems, menuMiscReverseItems, menuMiscListDifferentItems, menuMiscQueryCommonItems, menuMiscExplorerFolder, menuMiscCommandPrompt, menuMiscBurnToCD, menuMiscWebDownload, menuMiscWebClientUtilities;
 public ToolStripMenuItem menuWindow, menuWindowNext, menuWindowPrior, menuWindowArrangeIcons, menuWindowCascade, menuWindowTileHorizontal, menuWindowTileVertical;
@@ -1011,12 +1011,17 @@ menuNavigateNextPart= CreateMenuItem("Next Part", "Alt+PageDown", menuItem_Click
 menuNavigatePriorPart= CreateMenuItem("Prior Part", "Alt+PageUp", menuItem_Click, "child silent");
 menuNavigateNextSection= CreateMenuItem("Next Section", "Control+PageDown", menuItem_Click, "child silent");
 menuNavigatePriorSection= CreateMenuItem("Prior Section", "Control+PageUp", menuItem_Click, "child silent");
+// Same-level variants, approved by Kasperczak 14.08.2026 18:50.  Shift means
+// "only my level", skipping subsections, mirroring how screen readers let you
+// walk headings of one level in a browser.
+menuNavigateNextSectionSameLevel= CreateMenuItem("Next Section at Same Level", "Control+Shift+PageDown", menuItem_Click, "child silent");
+menuNavigatePriorSectionSameLevel= CreateMenuItem("Prior Section at Same Level", "Control+Shift+PageUp", menuItem_Click, "child silent");
 menuNavigateGoToSection= CreateMenuItem("Go to Section", "F6", menuItem_Click, "child speak");
 menuNavigateGoToContents = CreateMenuItem("Go to Contents", "Shift+F6", menuItem_Click, "child speak");
 menuNavigateSearchForTopic = CreateMenuItem("Search for Topic ...", "Control+F6", menuItem_Click, "child silent");
 menuNavigateSearchForTopicAgain = CreateMenuItem("Search for Topic Again", "Alt+F6", menuItem_Click, "child silent");
 menuNavigateGoToStartOfSelection = CreateMenuItem("Go to Start of Selection", "Alt+Shift+F8", menuItem_Click, "child speak");
-menuNavigate.DropDownItems.AddRange(new ToolStripItem[] {menuNavigateForwardFind, menuNavigateReverseFind, menuNavigateForwardFindWithRegExp, menuNavigateReverseFindWithRegExp,  menuNavigateForwardFindAtCursor, menuNavigateReverseFindAtCursor, menuNavigateForwardFindAgain, menuNavigateReverseFindAgain, menuNavigateJumpToLine, menuNavigateJumpToLineAgain, menuNavigateGoToPercent, menuNavigateGoToPercentAgain, menuNavigateGoToPart, menuNavigateSetBookmark, menuNavigateClearBookmark, menuNavigateGoToBookmark, menuNavigateNextBookmark, menuNavigatePriorBookmark, menuNavigateHomeCharacter, menuNavigateEndCharacter, menuNavigateStartTag, menuNavigateEndTag,  menuNavigateNextJustify, menuNavigatePriorJustify, menuNavigateNextStyle, menuNavigatePriorStyle, menuNavigateNextBaseline, menuNavigatePriorBaseline, menuNavigateNextFont, menuNavigatePriorFont, menuNavigateRightBrace, menuNavigateNextBlock, menuNavigatePriorBlock, menuNavigateLeftBrace, menuNavigateNextIndent, menuNavigatePriorIndent, menuNavigateNextChunk,  menuNavigatePriorChunk, menuNavigateNextSentence, menuNavigatePriorSentence, menuNavigateNextParagraph, menuNavigatePriorParagraph, menuNavigateNextPart, menuNavigatePriorPart, menuNavigateNextSection, menuNavigatePriorSection, menuNavigateGoToSection, menuNavigateGoToContents, menuNavigateSearchForTopic, menuNavigateSearchForTopicAgain, menuNavigateGoToStartOfSelection});
+menuNavigate.DropDownItems.AddRange(new ToolStripItem[] {menuNavigateForwardFind, menuNavigateReverseFind, menuNavigateForwardFindWithRegExp, menuNavigateReverseFindWithRegExp,  menuNavigateForwardFindAtCursor, menuNavigateReverseFindAtCursor, menuNavigateForwardFindAgain, menuNavigateReverseFindAgain, menuNavigateJumpToLine, menuNavigateJumpToLineAgain, menuNavigateGoToPercent, menuNavigateGoToPercentAgain, menuNavigateGoToPart, menuNavigateSetBookmark, menuNavigateClearBookmark, menuNavigateGoToBookmark, menuNavigateNextBookmark, menuNavigatePriorBookmark, menuNavigateHomeCharacter, menuNavigateEndCharacter, menuNavigateStartTag, menuNavigateEndTag,  menuNavigateNextJustify, menuNavigatePriorJustify, menuNavigateNextStyle, menuNavigatePriorStyle, menuNavigateNextBaseline, menuNavigatePriorBaseline, menuNavigateNextFont, menuNavigatePriorFont, menuNavigateRightBrace, menuNavigateNextBlock, menuNavigatePriorBlock, menuNavigateLeftBrace, menuNavigateNextIndent, menuNavigatePriorIndent, menuNavigateNextChunk,  menuNavigatePriorChunk, menuNavigateNextSentence, menuNavigatePriorSentence, menuNavigateNextParagraph, menuNavigatePriorParagraph, menuNavigateNextPart, menuNavigatePriorPart, menuNavigateNextSection, menuNavigatePriorSection, menuNavigateNextSectionSameLevel, menuNavigatePriorSectionSameLevel, menuNavigateGoToSection, menuNavigateGoToContents, menuNavigateSearchForTopic, menuNavigateSearchForTopicAgain, menuNavigateGoToStartOfSelection});
 //Dialog.Show("Navigate.", menuNavigate.DropDownItems.Count);
 
 menuQuery = CreateMenu("&Query");
@@ -4641,6 +4646,14 @@ GoToAdjacentMarkdownHeading(rtb, false);
 
 if (menuItem == menuNavigatePriorSection) {
 GoToAdjacentMarkdownHeading(rtb, true);
+}
+
+if (menuItem == menuNavigateNextSectionSameLevel) {
+GoToAdjacentMarkdownHeading(rtb, false, true);
+}
+
+if (menuItem == menuNavigatePriorSectionSameLevel) {
+GoToAdjacentMarkdownHeading(rtb, true, true);
 }
 
 if (menuItem == menuNavigateGoToSection) {
@@ -8578,12 +8591,19 @@ if (keyData != Keys.Enter && hashKey.ContainsKey(keyData)) return false;
 
 				// Control+PageDown / Control+PageUp -- go to the next or previous
 				// Markdown heading of ANY level.  Kasperczak confirmed "every
-				// level" explicitly (Telegram 14.08.2026 18:34).  At the last or
-				// first heading the cursor stays put and only a message is
-				// announced, matching what we agreed for bookmarks (no wrapping).
-				// The whole row is spoken, again as agreed for bookmarks, because
-				// the heading text alone would not tell him where he landed.
+				// level" explicitly (Telegram 14.08.2026 18:34).  With Shift held
+				// it walks only headings of the SAME level as the section the
+				// cursor is in, skipping subsections -- he approved that too
+				// (18:50: "Pomysl z nawigacja Ctrl + Page Up, Page Down i z
+				// Shiftem po wszystkich podanego poziomu sekcjach to jest pomysl
+				// jak najbardziej dobry").  At the last or first matching heading
+				// the cursor stays put and only a message is announced, matching
+				// what we agreed for bookmarks (no wrapping).
 				private void GoToAdjacentMarkdownHeading(HomerRichTextBox rtb, bool bUp) {
+				GoToAdjacentMarkdownHeading(rtb, bUp, false);
+				} // GoToAdjacentMarkdownHeading method
+
+				private void GoToAdjacentMarkdownHeading(HomerRichTextBox rtb, bool bUp, bool bSameLevelOnly) {
 				if (rtb == null) return;
 				string sText = rtb.Text;
 				List<MarkdownSectionHeading> headings = GetMarkdownSectionHeadings(sText);
@@ -8593,29 +8613,82 @@ if (keyData != Keys.Enter && hashKey.ContainsKey(keyData)) return false;
 				}
 
 				int iCurrent = rtb.Index;
+
+				// "Same level" means the level of the section the cursor sits in.
+				// Before the first heading of the file there is no such section,
+				// so fall back to the level of the first heading.
+				int iWantLevel = 0;
+				if (bSameLevelOnly) {
+				int iHere = GetCurrentMarkdownSectionHeadingIndex(headings, iCurrent);
+				iWantLevel = (iHere >= 0) ? headings[iHere].Level : headings[0].Level;
+				}
+
 				int iTarget = -1;
 				if (bUp) {
 				for (int i = headings.Count - 1; i >= 0; i--) {
-				if (headings[i].Start < iCurrent) {iTarget = i; break;}
+				if (headings[i].Start >= iCurrent) continue;
+				if (bSameLevelOnly && headings[i].Level != iWantLevel) continue;
+				iTarget = i;
+				break;
 				}
 				if (iTarget == -1) {
-				AddMessage("First heading!");
+				AddMessage(bSameLevelOnly ? "First heading at this level!" : "First heading!");
 				return;
 				}
 				}
 				else {
 				for (int i = 0; i < headings.Count; i++) {
-				if (headings[i].Start > iCurrent) {iTarget = i; break;}
+				if (headings[i].Start <= iCurrent) continue;
+				if (bSameLevelOnly && headings[i].Level != iWantLevel) continue;
+				iTarget = i;
+				break;
 				}
 				if (iTarget == -1) {
-				AddMessage("Last heading!");
+				AddMessage(bSameLevelOnly ? "Last heading at this level!" : "Last heading!");
 				return;
 				}
 				}
 
 				rtb.Index = headings[iTarget].Start;
-				Util.Say(rtb.RowText);
+				// He asked for content first, then the heading (14.08.2026 18:50:
+				// "wpierw tresc, a potem naglowek"), so read the body line that
+				// follows the heading and then the heading itself.
+				string sBody = GetMarkdownHeadingBodyLine(sText, headings, iTarget);
+				string sHeading = GetMarkdownSectionHeadingTitle(headings[iTarget]);
+				if (sBody.Length > 0) Util.Say(sBody + ", " + sHeading);
+				else Util.Say(sHeading);
 				} // GoToAdjacentMarkdownHeading method
+
+				// First non-empty line of a section's body, i.e. the text under the
+				// heading, with Markdown decoration stripped so it reads plainly.
+				private static string GetMarkdownHeadingBodyLine(string sText, List<MarkdownSectionHeading> headings, int iHeading) {
+				if (String.IsNullOrEmpty(sText)) return "";
+				int iStart = headings[iHeading].Start;
+				int iNewLine = sText.IndexOf('\n', iStart);
+				if (iNewLine < 0) return "";
+				int iEnd = GetMarkdownSectionEnd(sText, headings, iHeading);
+				int iPos = iNewLine + 1;
+				while (iPos < iEnd) {
+				int iNext = sText.IndexOf('\n', iPos);
+				int iLineEnd = (iNext >= 0 && iNext < iEnd) ? iNext : iEnd;
+				string sLine = sText.Substring(iPos, iLineEnd - iPos);
+				if (sLine.EndsWith("\r")) sLine = sLine.Substring(0, sLine.Length - 1);
+				string sTrim = sLine.Trim();
+				if (sTrim.Length > 0 && !MarkdownReview_IsFenceLine(sLine)) {
+				try {
+				sTrim = MarkdownHeadingPrefixRegex.Replace(sTrim, "");
+				sTrim = MarkdownBulletPrefixRegex.Replace(sTrim, "", 1);
+				sTrim = MarkdownNumberPrefixRegex.Replace(sTrim, "", 1);
+				} catch {}
+				sTrim = sTrim.Trim();
+				if (sTrim.Length > 0) return sTrim;
+				}
+				if (iNext < 0 || iNext >= iEnd) break;
+				iPos = iNext + 1;
+				}
+				return "";
+				} // GetMarkdownHeadingBodyLine method
+
 
 				// Control+Enter -- start a new section, i.e. insert a Markdown
 				// heading prefix at the level of the heading the cursor sits in.
