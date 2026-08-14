@@ -175,7 +175,7 @@ Use the Mail command, Control+M, to send the current file as the body of a messa
 
 Press Alt+Backslash to open Windows Explorer in the directory containing the current file, or Control+Backslash to open a command prompt there.  Besides the current folder as the default to open, the intervening dialog also lets you open the EdSharp program folder, data folder, or snippet folder.  It also lets you create a new folder on disk.  
 
-Press Control+F9 to verify the current compiler and folder of EdSharp.  Control+0 lets you change the current folder to one containing recent or favorite files, which are put in a list.  Press Control+Shift+0 to change to a special folder of Windows, e.g., My Documents.  These commands may be more efficient than navigating the standard Windows open file dialog, invoked with Control+O.
+Press Control+F9 to verify the current compiler and folder of EdSharp.  Control+0 lets you change the current folder to one containing recent or favorite files, which are put in a list.  Press Control+Alt+0 to change to a special folder of Windows, e.g., My Documents.  These commands may be more efficient than navigating the standard Windows open file dialog, invoked with Control+O.
 
 ## Invoking Snippets
 Press Alt+S to save all or selected text to a file that may be conveniently pasted into other documents.  You may give the file a descriptive name and an extension appropriate for its content.  It is saved in a subfolder of the EdSharp data folder.  Each programming compiler or interpreter may have its own set of snippets.  The subfolder name is the same as the current value of the Pick Compiler command, Control+Shift+F5.  If no compiler has been chosen, the "Default" subfolder is used.
@@ -274,9 +274,9 @@ EdSharp supports several aspects of Rich Text Format (.rtf) as well as plain tex
 
 Formatting commands include the following.  Use the Justify command, Alt+Shift+J, to set the horizontal alignment of text as left, bullet, center, or right.  This formatting applies to either selected text or the current hard line -- a line of text terminated by a hard line break (created by pressing Enter rather than wrapping).
 
-Use the Style command, Alt+Slash, to set or clear bold, italic, or underline formatting.  This applies to either selected text or text ahead of the current cursor position.  The BaseLine command, Alt+Shift+6 (think of a caret), creates a subscript or superscript with selected text or text ahead of the cursor.  The Selection Font command, Alt+Shift+Dash, adjusts the font or color of text (think of a "dashing" display).  The key to its right, Alt+Shift+Equals, is for setting the default font of a new document.  These Justify, Style, Baseline, and Font dialogs also indicate current format settings.
+Use the Style command, Alt+Slash, to set or clear bold, italic, or underline formatting.  This applies to either selected text or text ahead of the current cursor position.  The BaseLine command, Alt+Shift+F6, creates a subscript or superscript with selected text or text ahead of the cursor.  The Selection Font command, Alt+Shift+Dash, adjusts the font or color of text (think of a "dashing" display).  The key to its right, Alt+Shift+Equals, is for setting the default font of a new document.  These Justify, Style, Baseline, and Font dialogs also indicate current format settings.
 
-Navigation commands let you move forward or backward to a change in formatting.  Control+RightBracket goes to the next justification change, and Control+LeftBracket goes to the previous one.  Control+6 goes to the next baseline change, and Control+Shift+6 goes to the previous one.  Control+Slash goes to the next style change, and Control+Shift+Slash goes to the previous one.  Control+Dash goes to the next font change and Control+Shift+Dash goes to the previous one.  The cursor stops at the character with different formatting.  The new formatting is announced and current context is read.
+Navigation commands let you move forward or backward to a change in formatting.  Control+RightBracket goes to the next justification change, and Control+LeftBracket goes to the previous one.  Control+6 goes to the next baseline change, and Control+Alt+6 goes to the previous one.  Control+Slash goes to the next style change, and Control+Shift+Slash goes to the previous one.  Control+Dash goes to the next font change and Control+Shift+Dash goes to the previous one.  The cursor stops at the character with different formatting.  The new formatting is announced and current context is read.
 
 To query the current font and color, press Alt+Dash.  For styles, baseline, and justification, press Alt+Slash.
 
@@ -484,7 +484,7 @@ Since Control+H is assigned to the the HTML Format command by default, however, 
 
 A command without a hot key may still be invoked via the regular menu system or Alternate Menu (Alt+F10).  The terms used to identify available keys are listed in [Microsoft's Keys enumeration reference](<https://learn.microsoft.com/en-us/dotnet/api/system.windows.forms.keys>).
 
-Certain configuration options are associated with the current compiler rather than being global .  Specifically, favorites, bookmarks, and user-defined tokens apply to the current compiler (picked via Control+Shift+F5), so you can work with items more relevant to each coding project.  The Reset Configuration command, Alt+Shift+0, lets you easily remove custom settings and restore defaults of EdSharp.  This command lets you choose whether to reset the main configuration, current compiler configuration, or create a new compiler configuration.  The New choice prompts for the compiler name, command line, AbbreviateOutput, NavigatePart, QuotePrefix, and ExtensionDefault settings.  
+Certain configuration options are associated with the current compiler rather than being global .  Specifically, favorites, bookmarks, and user-defined tokens apply to the current compiler (picked via Control+Shift+F5), so you can work with items more relevant to each coding project.  The Reset Configuration command, Alt+Shift+F10, lets you easily remove custom settings and restore defaults of EdSharp.  This command lets you choose whether to reset the main configuration, current compiler configuration, or create a new compiler configuration.  The New choice prompts for the compiler name, command line, AbbreviateOutput, NavigatePart, QuotePrefix, and ExtensionDefault settings.  
 
 A compiler configuration file is stored in the EdSharp data folder in a file having the compiler name and a .ini extension.  For example, if you created settings for the "Delphi" compiler, EdSharp would create a Delphi entry in the Compilers section of EdSharp.ini, and then store related favorites, bookmarks, and user-defined tokens in Delphi.ini.  Press Control+F9 to query the current compiler and directory.
 
@@ -550,7 +550,7 @@ Calculate Date=Control+Shift+Semi-colon, Calculate and insert date
 Configuration Options=Alt+Shift+C, Adjust configuration options through a dialog
 Set Default Font and Color=Alt+Shift+Equals, Set default font and color for editing window
 Manual Options=Alt+Shift+M, Adjust options by directly editing the main configuration file
-Reset Configuration=Alt+Shift+0, Revert to default options, or define a new compiler configuration
+Reset Configuration=Alt+Shift+F10, Revert to default options, or define a new compiler configuration
 
 Copy=Control+C, Copy selected text to clipboard, or copy current line if no selection
 Copy Append=Alt+C, Append selected text to clipboard, or append current line if no selection
@@ -637,7 +637,7 @@ Compile=Control+F5, Compile source code, say output, and jump to error position
 Pick Compiler=Control+Shift+F5, Pick a compiler or interpreter from the list of those configured
 Say Compiler=Control+F9, Say current compiler and folder
 Go to Folder=Control+0, Go to folder containing recent or favorite files
-Go to Special Folder=Control+Shift+0, Go to special folder of Windows
+Go to Special Folder=Control+Alt+0, Go to special folder of Windows
 Go to Environment=Control+Shift+G, Go to interactive environment of current compiler
 
 Spell Check=F7, Spell check all or selected text
@@ -704,14 +704,14 @@ Text Combine=Control+Shift+T, Convert other formats to text and combine them in 
 
 Justify=Alt+Shift+J, Set justification of cursor or selected text
 Style=Alt+Shift+Slash, Set style of cursor or selected text
-Baseline=Alt+Shift+6, Set vertical alignment of cursor or selected text
+Baseline=Alt+Shift+F6, Set vertical alignment of cursor or selected text
 Set Selection Font=Alt+Shift+Dash, Set font of cursor or selected text
 Next Alignment=Control+RightBracket, Go to next change in justification
 Prior Alignment=Control+LeftBracket, Go to previous change in justification
 Next Style=Control+Slash, Go to next change in style
 Prior Style=Control+Shift+Slash, Go to previous change in style
 Next Baseline=Control+6, Go to next change in baseline
-Prior Baseline=Control+Shift+6, Go to previous change in baseline
+Prior Baseline=Control+Alt+6, Go to previous change in baseline
 Next Font=Control+Dash, Go to next change in font
 Prior Font=Control+Shift+Dash, Go to previous change in font
 Say Font=Alt+Dash, Say current font and color

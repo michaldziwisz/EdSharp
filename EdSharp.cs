@@ -937,7 +937,10 @@ menuEditAlign = CreateMenuItem("Align", "Alt+Shift+A", menuItem_Click, "child sp
 menuEditIndentMode = CreateMenuItem("Indent Mode", "Alt+Shift+I", menuItem_Click, "child speak");
 menuEditJustify = CreateMenuItem("Justify ...", "Alt+Shift+J", menuItem_Click, "child silent");
 menuEditStyle = CreateMenuItem("Style ...", "Alt+Shift+OemQuestion", menuItem_Click, "child silent");
-menuEditBaseline = CreateMenuItem("Baseline ...", "Alt+Shift+D6", menuItem_Click, "child silent");
+// Moved off Alt+Shift+D6 so file slot 6 can be assigned like every other
+// slot -- Kasperczak authorized this move explicitly (14.08.2026 18:19).
+// Kept the "6" mnemonic by landing on the matching function key.
+menuEditBaseline = CreateMenuItem("Baseline ...", "Alt+Shift+F6", menuItem_Click, "child silent");
 menuEditSetSelectionFont = CreateMenuItem("Set Selection Font ...", "Alt+Shift+OemMinus", menuItem_Click, "child speak");
 menuEdit.DropDownItems.AddRange(new ToolStripItem[] {menuEditSelectAll, menuEditUnselectAll, menuEditCopy, menuEditCopyAppend, menuEditCopyRichText, menuEditCut, menuEditCutAppend, menuEditPaste, menuEditPasteFile, menuEditUndo, menuEditRedo, menuEditStartSelection, menuEditCompleteSelection, menuEditReselect, menuEditCopyAll, menuEditSelectChunk, menuEditAppendFromClipboard, menuEditQuote, menuEditUnquote, menuEditUpperCase, menuEditLowerCase, menuEditProperCase, menuEditSwapCase, menuEditYieldEncoding, menuEditJoinLines, menuEditHardLineBreak, menuEditEnterNewLine, menuEditIndentNewLine, menuEditIndentNewLinePrior, menuEditIndent, menuEditOutdent, menuEditAlign, menuEditIndentMode, menuEditJustify, menuEditStyle, menuEditBaseline, menuEditSetSelectionFont});
 //Dialog.Show("Edit.", menuEdit.DropDownItems.Count);
@@ -1042,7 +1045,11 @@ menuMisc = CreateMenu("&Misc");
 menuMiscSetDefaultFont = CreateMenuItem("Set Default Font and Color ...", "Alt+Shift+Oemplus", menuItem_Click, "child speak");
 menuMiscConfigurationOptions = CreateMenuItem("Configuration Options ...", "Alt+Shift+C", menuItem_Click, "frame silent");
 menuMiscManualOptions = CreateMenuItem("Manual Options", "Alt+Shift+M", menuItem_Click, "frame silent");
-menuMiscResetConfiguration = CreateMenuItem("Reset Configuration", "Alt+Shift+D0", menuItem_Click, "frame silent");
+// Moved off Alt+Shift+D0 so file slot 10 can be assigned like every other
+// slot -- Kasperczak authorized this move explicitly (14.08.2026 18:19).
+// This command wipes settings, so it now sits on a chord that is hard to
+// hit by accident.
+menuMiscResetConfiguration = CreateMenuItem("Reset Configuration", "Alt+Shift+F10", menuItem_Click, "frame silent");
 menuMiscGoToFolder = CreateMenuItem("Go to Folder", "Control+D0", menuItem_Click, "frame silent");
 menuMiscGoToSpecialFolder = CreateMenuItem("Go to Special Folder", "Control+Alt+D0", menuItem_Click, "frame silent");
 // Control+W was freed to become an additional Close Window chord.  Unwrap
@@ -8364,8 +8371,10 @@ if (keyData != Keys.Enter && hashKey.ContainsKey(keyData)) return false;
 		// Keyboard order: 1..9 are slots 1..9, and 0 is slot 10.
 		int iSlot = (iDigit == 0) ? 10 : iDigit;
 
-		// Yield to any command still holding this chord (Alt+Shift+D6 =
-		// Baseline), so we never silently shadow an existing hotkey.
+		// Yield to any command still holding this chord, so we never silently
+		// shadow an existing hotkey.  As of 5.0.8 the whole Alt+digit and
+		// Alt+Shift+digit range is free (Baseline moved to Alt+Shift+F6 and
+		// Reset Configuration to Alt+Shift+F10), so all ten slots work.
 		if (hashKey.ContainsKey(keyData)) return false;
 
 		if (this.KeyDescriber) {
