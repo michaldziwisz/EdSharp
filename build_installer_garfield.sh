@@ -104,6 +104,11 @@ for key in (b'AppVersion', b'VersionInfoVersion'):
     raw, n = re.subn(rb'(?m)^' + key + rb'=.*?\r?$', key + b'=' + ver.encode(), raw)
     if n != 1:
         raise SystemExit(f'BLAD: oczekiwano jednej linii {key.decode()}, znaleziono {n}')
+# AppVerName to nazwa, ktora WIDZI uzytkownik (instalator, Panel sterowania).
+# Bez tego instalator 5.0.12 przedstawialby sie jako poprzednia wersja.
+raw, n = re.subn(rb'(?m)^AppVerName=.*?\r?$', b'AppVerName=EdSharpNG ' + ver.encode() + b' (beta)', raw)
+if n != 1:
+    raise SystemExit(f'BLAD: oczekiwano jednej linii AppVerName, znaleziono {n}')
 open(path, 'wb').write(raw)
 PY
 

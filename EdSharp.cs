@@ -494,12 +494,20 @@ sFile = value;
 
 public DateTime FileTime;
 public bool FileTimeChecked = false;
+// Order in which this window was opened, used by the Control+digit window
+// navigation: Control+1 goes to the first window opened, Control+2 to the
+// second, and so on (Kasperczak, Telegram 14.08.2026 19:23).  The framework
+// MdiChildren array is ordered by activation, not by opening, so the order
+// has to be remembered explicitly.
+private static int iNextOpenSequence = 0;
+public int OpenSequence = 0;
 public MdiChild(MdiFrame frame) {
 string sTitle = frame.GetNoNameTitle();
 new MdiChild(frame, sTitle);
 } // MdiChild constructor
 
 public MdiChild(MdiFrame frame, string sTitle) {
+this.OpenSequence = ++iNextOpenSequence;
 this.SuspendLayout();
 this.MdiParent = frame;
 HomerRichTextBox rtb = new HomerRichTextBox();
@@ -889,10 +897,10 @@ menuFileClose = CreateMenuItem("&Close Window", "Control+F4", menuItem_Click, "c
 // so the extra one is dispatched in HandleCloseWindowKey.
 
 menuFileCloseAllButCurrentWindow = CreateMenuItem("Close All but Current Window", "Control+Shift+F4", menuItem_Click, "child speak");
-// File Slots: Alt+digit opens the file remembered in that slot, Alt+Shift+digit
-// assigns the current file to it (see HandleFileSlotKey).  This menu item lists
-// the slots so the feature is discoverable with a screen reader.
-menuFileSlots = CreateMenuItem("File Slots ...", "Alt+Shift+F2", menuItem_Click, "frame silent");
+// Numbered Files: Alt+digit opens the file remembered under that digit,
+// Alt+Shift+digit assigns the current file to it (see HandleFileSlotKey).  This
+// menu item lists them so the feature is discoverable with a screen reader.
+menuFileSlots = CreateMenuItem("Numbered Files ...", "Alt+Shift+F2", menuItem_Click, "frame silent");
 menuFileExit = CreateMenuItem("&E&xit EdSharp", "Alt+F4", menuItem_Click, "frame speak");
 menuFile.DropDownItems.AddRange(new ToolStripItem[] {menuFileNew, menuFileNewFromClipboard, menuFileOpen, menuFileOpenOtherFormat, menuFileOpenAgain, menuFileRecent, menuFileSetFavorite, menuFileClearFavorite, menuFileListFavorites, menuFileFind, menuFileSave, menuFileSaveAs, menuFileSaveCopy, menuFileExport, menuFileRename, menuFileProperties, menuFileMailBody, menuFileMailAttach, menuFilePrint, menuFileRun, menuFileCurrentWindows, menuFileClose, menuFileCloseAllButCurrentWindow, menuFileSlots, menuFileExit});
 //Dialog.Show("File.", menuFile.DropDownItems.Count);
@@ -1241,6 +1249,7 @@ this.KeyIndex = iIndex;
 // Util.Say("Repeat " + this.KeyRepeat);
 
 if (HandleFileSlotKey(keyData)) return true;
+if (HandleWindowNumberKey(keyData)) return true;
 if (HandleCloseWindowKey(keyData)) return true;
 if (HandleSectionMoveKey(keyData)) return true;
 // Markdown review (preview) mode: Escape toggles it on .md files; while
@@ -8374,7 +8383,7 @@ if (keyData != Keys.Enter && hashKey.ContainsKey(keyData)) return false;
 		if (hashKey.ContainsKey(keyData)) return false;
 
 		if (this.KeyDescriber) {
-		AddMessage((bAssign ? "Assign file slot " : "Open file slot ") + iSlot);
+		AddMessage((bAssign ? "Assign numbered file " : "Open numbered file ") + iSlot);
 		return true;
 		}
 
@@ -8382,6 +8391,89 @@ if (keyData != Keys.Enter && hashKey.ContainsKey(keyData)) return false;
 		else OpenFileSlot(iSlot);
 		return true;
 		} // HandleFileSlotKey method
+
+		// Control+digit -- go to an open editing window by the order in which it
+		// was opened, and say its file name.  Requested by Kasperczak as a
+		// regression from EdSharp 4 (Telegram 14.08.2026 19:23): "Control 1 do
+		// Control 9 to jest cos takiego jak Control Tab, Control Shift Tab, czyli
+		// nawigacja pomiedzy plikami w otwartych zakladkach (...) program powinien
+		// czytac, jak nacisne Control 1 - nazwe pierwszego pliku (...) pierwszego
+		// i drugiego to rozumiem w kolejnosci otwarcia."  Deliberately unrelated
+		// to the Alt+digit numbered files: those are fixed assignments, these are
+		// just the tabs that happen to be open now.
+		// Chords: Control+1..Control+9 only.  Control+0 is NOT claimed, because
+		// Control+D0 is Go to Folder in stock EdSharp; there is also no tenth
+		// tab slot in what he asked for.  Control+4 and Control+6 stay with
+		// Format Code and Next Baseline -- the guard below yields to them, so
+		// those two digits do not navigate windows.  Reported to him.
+		private bool HandleWindowNumberKey(Keys keyData) {
+		if ((keyData & Keys.Control) != Keys.Control) return false;
+		if ((keyData & Keys.Alt) == Keys.Alt) return false;
+		if ((keyData & Keys.Shift) == Keys.Shift) return false;
+
+		Keys keyCode = keyData & Keys.KeyCode;
+		int iDigit = -1;
+		if (keyCode >= Keys.D1 && keyCode <= Keys.D9) iDigit = (int) keyCode - (int) Keys.D0;
+		else if (keyCode >= Keys.NumPad1 && keyCode <= Keys.NumPad9) iDigit = (int) keyCode - (int) Keys.NumPad0;
+		else return false;
+
+		// Never shadow a command that already owns this chord.
+		if (hashKey.ContainsKey(keyData)) return false;
+
+		if (this.KeyDescriber) {
+		AddMessage("Go to window " + iDigit);
+		return true;
+		}
+
+		GoToWindowByOpenOrder(iDigit);
+		return true;
+		} // HandleWindowNumberKey method
+
+		// Activate the nth window in opening order and say its file name.
+		private void GoToWindowByOpenOrder(int iNumber) {
+		List<MdiChild> children = new List<MdiChild>();
+		foreach (MdiChild c in this.MdiChildren) children.Add(c);
+		if (children.Count == 0) {
+		AddMessage("No windows!");
+		return;
+		}
+
+		children.Sort(delegate(MdiChild a, MdiChild b) {return a.OpenSequence.CompareTo(b.OpenSequence);});
+		if (iNumber > children.Count) {
+		AddMessage("Only " + children.Count + (children.Count == 1 ? " window!" : " windows!"));
+		return;
+		}
+
+		MdiChild target = children[iNumber - 1];
+		string sName = GetWindowSpokenName(target);
+		if (target == this.Child) {
+		// Already here: say the name anyway, so the key always answers.
+		AnnounceWindowName(sName);
+		return;
+		}
+
+		target.Activate();
+		// Activating a window moves the focus, and a plain message would be
+		// swallowed or delayed by the screen reader announcing the control.
+		// Force-speak it, the same way the section move commands do.
+		AnnounceWindowName(sName);
+		} // GoToWindowByOpenOrder method
+
+		// Say a window name so it survives the focus change.
+		private void AnnounceWindowName(string sName) {
+		if (sName == null || sName.Length == 0) return;
+		try {if (Win32.IsNVDAActive()) Win32.NVDACancelSpeech();} catch {}
+		AddMessage(sName, true);
+		} // AnnounceWindowName method
+
+		// What a window is called out loud: the file name, or the window title
+		// for a document that has never been saved.
+		private static string GetWindowSpokenName(MdiChild child) {
+		if (child == null) return "";
+		string sFile = child.File;
+		if (sFile != null && sFile.Contains(@"\")) return Path.GetFileName(sFile);
+		return (child.Text == null) ? "" : child.Text;
+		} // GetWindowSpokenName method
 
 		// Control+W = Close Window, an additional chord alongside Control+F4.
 		// In stock EdSharp Control+W was Word Wrap; that command was moved to
@@ -8414,28 +8506,45 @@ if (keyData != Keys.Enter && hashKey.ContainsKey(keyData)) return false;
 		}
 
 		App.WriteValue(c_sFileSlotSection, iSlot.ToString(), sFile);
-		AddMessage("Slot " + iSlot + " is " + Path.GetFileName(sFile));
+		AddMessage("Numbered file " + iSlot + " is " + Path.GetFileName(sFile));
 		} // AssignFileSlot method
 
 		// Open (or activate, if already open) the file remembered in a slot.
+		// Kasperczak asked for the speech to be plain (Telegram 14.08.2026
+		// 19:16): "Alt-cyfra Returning. Niepotrzebne, Wystarczy, jak program
+		// powie nazwe pliku. Jesli nie jest otwarty, to najwyzej opening nazwa
+		// pliku."  So the generic "returning" of OpenOrActivateWindow is bypassed
+		// here: an already open file just says its name, and a closed one says
+		// "Opening" and the name.
 		private void OpenFileSlot(int iSlot) {
 		string sFile = App.ReadValue(c_sFileSlotSection, iSlot.ToString(), "");
 		sFile = Util.Unquote(sFile).Trim();
 		if (sFile.Length == 0) {
-		AddMessage("Slot " + iSlot + " is empty!");
+		AddMessage("Numbered file " + iSlot + " is empty!");
 		return;
 		}
 
 		if (!File.Exists(sFile)) {
-		AddMessage("Slot " + iSlot + " file not found!");
+		AddMessage("Numbered file " + iSlot + " not found!");
 		return;
 		}
 
+		string sName = Path.GetFileName(sFile);
+		foreach (MdiChild child in this.MdiChildren) {
+		if (!Util.Equiv(child.File, Util.GetLfn(sFile))) continue;
+		child.Activate();
+		AnnounceWindowName(sName);
+		return;
+		}
+
+		AnnounceWindowName("Opening " + sName);
 		OpenOrActivateWindow(sFile, 0);
 		} // OpenFileSlot method
 
-		// The File Slots menu item: lists every assigned slot so the feature is
-		// discoverable, and opens the one chosen.
+		// The Numbered Files menu item: lists every assigned number so the
+		// feature is discoverable, and opens the one chosen.  Named "Numbered
+		// Files" on Kasperczak's choice (Telegram 14.08.2026 19:26: "po ang.
+		// Numbered files"; Polish "pliki numerowane" for the manual).
 		private void PickFileSlot() {
 		List<string> lsValue = new List<string>();
 		List<string> lsDisplay = new List<string>();
@@ -8448,11 +8557,11 @@ if (keyData != Keys.Enter && hashKey.ContainsKey(keyData)) return false;
 		}
 
 		if (lsValue.Count == 0) {
-		AddMessage("No file slots are assigned!");
+		AddMessage("No numbered files are assigned!");
 		return;
 		}
 
-		string sPick = Dialog.Pick("File Slots", lsValue.ToArray(), lsDisplay.ToArray(), false, 0);
+		string sPick = Dialog.Pick("Numbered Files", lsValue.ToArray(), lsDisplay.ToArray(), false, 0);
 		if (sPick.Length == 0) return;
 		if (!File.Exists(sPick)) {
 		AddMessage("File not found!");
@@ -8650,49 +8759,21 @@ if (keyData != Keys.Enter && hashKey.ContainsKey(keyData)) return false;
 				}
 
 				rtb.Index = headings[iTarget].Start;
-				// He asked for content first, then the heading (14.08.2026 18:50:
-				// "wpierw tresc, a potem naglowek"), so read the body line that
-				// follows the heading and then the heading itself.
-				// The level is announced as "heading 3", NOT "heading level 3":
-				// Kasperczak asked for exactly that wording (14.08.2026 18:59:
-				// "Tak na zasadzie: tresc naglowek 3, tresc naglowek 6 nie
-				// tresc poziom naglowka 3"), so the word "level" is omitted.
-				string sBody = GetMarkdownHeadingBodyLine(sText, headings, iTarget);
+				// Announce the heading TEXT and then its level, e.g.
+				// "Installation, heading 3".  Nothing else.
+				// History of this wording, so it is not "fixed" back by mistake:
+				// he wrote "wpierw tresc, a potem naglowek" (14.08.2026 18:50),
+				// which was first read as "the body under the heading" -- wrong.
+				// He clarified (14.08.2026 19:19): "Tresc jako tytul naglowka, w
+				// sensie tresc tekstowa, a nie informacja. Informacja naglowek 3,
+				// Dalsze prace naglowek 4. Tak powinno byc czytane."  So "tresc"
+				// meant the heading's own text, and the body line must NOT be read.
+				// The level is announced as "heading 3", NOT "heading level 3"
+				// (14.08.2026 18:59: "nie tresc poziom naglowka 3").
 				string sHeading = GetMarkdownSectionHeadingTitle(headings[iTarget]);
-				string sLevel = ", heading " + headings[iTarget].Level;
-				if (sBody.Length > 0) Util.Say(sBody + ", " + sHeading + sLevel);
-				else Util.Say(sHeading + sLevel);
+				Util.Say(sHeading + ", heading " + headings[iTarget].Level);
 				} // GoToAdjacentMarkdownHeading method
 
-				// First non-empty line of a section's body, i.e. the text under the
-				// heading, with Markdown decoration stripped so it reads plainly.
-				private static string GetMarkdownHeadingBodyLine(string sText, List<MarkdownSectionHeading> headings, int iHeading) {
-				if (String.IsNullOrEmpty(sText)) return "";
-				int iStart = headings[iHeading].Start;
-				int iNewLine = sText.IndexOf('\n', iStart);
-				if (iNewLine < 0) return "";
-				int iEnd = GetMarkdownSectionEnd(sText, headings, iHeading);
-				int iPos = iNewLine + 1;
-				while (iPos < iEnd) {
-				int iNext = sText.IndexOf('\n', iPos);
-				int iLineEnd = (iNext >= 0 && iNext < iEnd) ? iNext : iEnd;
-				string sLine = sText.Substring(iPos, iLineEnd - iPos);
-				if (sLine.EndsWith("\r")) sLine = sLine.Substring(0, sLine.Length - 1);
-				string sTrim = sLine.Trim();
-				if (sTrim.Length > 0 && !MarkdownReview_IsFenceLine(sLine)) {
-				try {
-				sTrim = MarkdownHeadingPrefixRegex.Replace(sTrim, "");
-				sTrim = MarkdownBulletPrefixRegex.Replace(sTrim, "", 1);
-				sTrim = MarkdownNumberPrefixRegex.Replace(sTrim, "", 1);
-				} catch {}
-				sTrim = sTrim.Trim();
-				if (sTrim.Length > 0) return sTrim;
-				}
-				if (iNext < 0 || iNext >= iEnd) break;
-				iPos = iNext + 1;
-				}
-				return "";
-				} // GetMarkdownHeadingBodyLine method
 
 
 				// Control+Enter -- start a new section, i.e. insert a Markdown
@@ -9909,7 +9990,10 @@ catch {}
 	bool bWantNoSync = (escMods == Keys.Shift);
 	if (!child.MarkdownReviewMode && !MarkdownReview_IsMarkdownFile(child.File)) return false;
 	if (this.KeyDescriber) {
-	AddMessage(bWantNoSync ? "Toggle detached preview" : "Toggle preview");
+	// While previewing, Escape always leaves and Shift+Escape only flips
+	// the synchronization, so describe the keys by what they really do.
+	if (child.MarkdownReviewMode) AddMessage(bWantNoSync ? "Switch preview synchronization" : "Back to editing");
+	else AddMessage(bWantNoSync ? "Open detached preview" : "Open preview");
 	return true;
 	}
 	MarkdownReview_ToggleCurrent(bWantNoSync);
@@ -10281,16 +10365,14 @@ catch {}
 	if (child == null) return;
 
 	if (child.MarkdownReviewMode) {
-	// Already previewing. If the requested mode matches the current one,
-	// this keystroke means "go back to editing". If it differs, switch the
-	// sync mode in place (Michal's safeguard: Shift+Esc while in a synced
-	// preview flips it to detached, and vice versa, without leaving preview).
-	if (child.MarkdownReviewNoSync == bNoSync) {
-	MarkdownReview_Exit(child);
-	}
-	else {
-	MarkdownReview_SwitchSyncMode(child, bNoSync);
-	}
+	// Already previewing.  Rule agreed with Kasperczak (Telegram
+	// 14.08.2026 19:17, "Tak przyjmuje. Zgadza sie."): plain Escape is the
+	// ONE and ONLY way out of the preview, no matter which mode you entered
+	// with, and Shift+Escape never leaves -- it only flips the
+	// synchronization in place.  That way the two keys cannot get in each
+	// other's way and Escape always means "back to editing".
+	if (bNoSync) MarkdownReview_SwitchSyncMode(child, !child.MarkdownReviewNoSync);
+	else MarkdownReview_Exit(child);
 	return;
 	}
 
