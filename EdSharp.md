@@ -278,7 +278,7 @@ Formatting commands include the following.  Use the Justify command, Alt+Shift+J
 
 Use the Style command, Alt+Slash, to set or clear bold, italic, or underline formatting.  This applies to either selected text or text ahead of the current cursor position.  The BaseLine command, Alt+Shift+F6, creates a subscript or superscript with selected text or text ahead of the cursor.  The Selection Font command, Alt+Shift+Dash, adjusts the font or color of text (think of a "dashing" display).  The key to its right, Alt+Shift+Equals, is for setting the default font of a new document.  These Justify, Style, Baseline, and Font dialogs also indicate current format settings.
 
-Navigation commands let you move forward or backward to a change in formatting.  Control+RightBracket goes to the next justification change, and Control+LeftBracket goes to the previous one.  Control+6 goes to the next baseline change, and Control+Alt+6 goes to the previous one.  Control+Slash goes to the next style change, and Control+Shift+Slash goes to the previous one.  Control+Dash goes to the next font change and Control+Shift+Dash goes to the previous one.  The cursor stops at the character with different formatting.  The new formatting is announced and current context is read.
+Navigation commands let you move forward or backward to a change in formatting.  Control+RightBracket goes to the next justification change, and Control+LeftBracket goes to the previous one.  Control+F2 goes to the next baseline change, and Control+Shift+F2 goes to the previous one.  Control+Slash goes to the next style change, and Control+Shift+Slash goes to the previous one.  Control+Dash goes to the next font change and Control+Shift+Dash goes to the previous one.  The cursor stops at the character with different formatting.  The new formatting is announced and current context is read.
 
 To query the current font and color, press Alt+Dash.  For styles, baseline, and justification, press Alt+Slash.
 
@@ -490,7 +490,7 @@ Certain configuration options are associated with the current compiler rather th
 
 A compiler configuration file is stored in the EdSharp data folder in a file having the compiler name and a .ini extension.  For example, if you created settings for the "Delphi" compiler, EdSharp would create a Delphi entry in the Compilers section of EdSharp.ini, and then store related favorites, bookmarks, and user-defined tokens in Delphi.ini.  Press Control+F9 to query the current compiler and directory.
 
-Press F4 to activate an editing window from a list of those currently open.  Press Control and a digit, Control+1 through Control+9, to go straight to an open window by the order in which it was opened: Control+1 is the first file you opened, Control+2 the second, and so on.  EdSharp says the file name of the window it moves to, or the window title for a document that has never been saved.  If you ask for a window that is not there, it says how many windows are open, and the cursor stays where it is.  This is window navigation, like Control+Tab and Control+Shift+Tab, and has nothing to do with the numbered files under Alt and a digit.  Control+4 and Control+6 are not available for this, because they already belong to the Format Code and Next Baseline commands.  Press Control+F4, or Control+W, to close the current window, or Control+Shift+F4 to close all windows except the current one.  EdSharp windows may be visually organized according to common MDI (multiple document interface) patterns.  The Window menu includes the following commands:  Arrange Icons, Alt+F11; Cascade, Control+F11; Tile Horizontal, Alt+Shift+F11; and Tile Vertical, Control+Shift+F11.
+Press F4 to activate an editing window from a list of those currently open.  Press Control and a digit, Control+1 through Control+9, to go straight to an open window by the order in which it was opened: Control+1 is the first file you opened, Control+2 the second, and so on.  EdSharp says the file name of the window it moves to, or the window title for a document that has never been saved.  If you ask for a window that is not there, it says how many windows are open, and the cursor stays where it is.  This is window navigation, like Control+Tab and Control+Shift+Tab, and has nothing to do with the numbered files under Alt and a digit.  The whole range Control+1 through Control+9 is available for this: the Format Code and Next Baseline commands, which used to hold Control+4 and Control+6, now live on Control+Shift+F6 and Control+F2.  Press Control+F4, or Control+W, to close the current window, or Control+Shift+F4 to close all windows except the current one.  EdSharp windows may be visually organized according to common MDI (multiple document interface) patterns.  The Window menu includes the following commands:  Arrange Icons, Alt+F11; Cascade, Control+F11; Tile Horizontal, Alt+Shift+F11; and Tile Vertical, Control+Shift+F11.
 
 Use the Alternate Menu command, Alt+F10, to execute a command from a single, alphebetized list.
 
@@ -661,7 +661,7 @@ Proper Case=Alt+U, Convert current or selected characters to proper case
 Swap Case=Alt+Shift+U, Convert lower case characters to upper case, and vice versa
 Yield Encoding=Alt+Shift+Y, Render all or selected text based on a character encoding
 
-Format Code =Control+4, Arrange indentation and other stylistic conventions in a C-like language
+Format Code =Control+Shift+F6, Arrange indentation and other stylistic conventions in a C-like language
 Repeat Line=Control+Y, Copy current line below it
 Evaluate Expression=Control+Equals, Evaluate current line or selected text as a JScript.NET expression and copy the result below
 Replace Tokens=Control+Shift+Equals, Swap user-defined tokens with their computed results in all or selected text
@@ -714,8 +714,8 @@ Next Alignment=Control+RightBracket, Go to next change in justification
 Prior Alignment=Control+LeftBracket, Go to previous change in justification
 Next Style=Control+Slash, Go to next change in style
 Prior Style=Control+Shift+Slash, Go to previous change in style
-Next Baseline=Control+6, Go to next change in baseline
-Prior Baseline=Control+Alt+6, Go to previous change in baseline
+Next Baseline=Control+F2, Go to next change in baseline
+Prior Baseline=Control+Shift+F2, Go to previous change in baseline
 Next Font=Control+Dash, Go to next change in font
 Prior Font=Control+Shift+Dash, Go to previous change in font
 Say Font=Alt+Dash, Say current font and color

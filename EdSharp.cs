@@ -999,8 +999,15 @@ menuNavigateNextJustify = CreateMenuItem("Next Alignment", "Control+OemCloseBrac
 menuNavigatePriorJustify = CreateMenuItem("Prior Alignment", "Control+OemOpenBrackets", menuItem_Click, "child silent");
 menuNavigateNextStyle = CreateMenuItem("Next Style", "Control+OemQuestion", menuItem_Click, "child silent");
 menuNavigatePriorStyle = CreateMenuItem("Prior Style", "Control+Shift+OemQuestion", menuItem_Click, "child silent");
-menuNavigateNextBaseline = CreateMenuItem("Next Baseline", "Control+D6", menuItem_Click, "child silent");
-menuNavigatePriorBaseline = CreateMenuItem("Prior Baseline", "Control+Alt+D6", menuItem_Click, "child silent");
+// Baseline navigation moved off the digits so Control+1..9 can walk the open
+// windows: Kasperczak authorized it (Telegram 14.08.2026 22:35, "Przenies.
+// CTRL-1-9 opening files tab").  The pair follows this file's own Next/Prior
+// convention (Control+key / Control+Shift+key), like Next/Prior Style and Font.
+// Prior Baseline deliberately leaves Control+Alt+D6: Util.Say returns false
+// while Alt+Control are held, so on that chord the command ran but announced
+// NOTHING to the screen reader.
+menuNavigateNextBaseline = CreateMenuItem("Next Baseline", "Control+F2", menuItem_Click, "child silent");
+menuNavigatePriorBaseline = CreateMenuItem("Prior Baseline", "Control+Shift+F2", menuItem_Click, "child silent");
 menuNavigateNextFont = CreateMenuItem("Next Font", "Control+OemMinus", menuItem_Click, "child silent");
 menuNavigatePriorFont = CreateMenuItem("Prior Font", "Control+Shift+OemMinus", menuItem_Click, "child silent");
 menuNavigateRightBrace = CreateMenuItem("Right Brace", "Control+Shift+OemCloseBrackets", menuItem_Click, "child silent");
@@ -1081,7 +1088,9 @@ menuMiscNoGuard = CreateMenuItem("No Guard", "Control+Shift+F7", menuItem_Click,
 menuMiscPyBrace = CreateMenuItem("PyBrace", "Alt+Shift+OemOpenBrackets", menuItem_Click, "child speak");
 menuMiscPyDent = CreateMenuItem("PyDent", "Alt+OemOpenBrackets", menuItem_Click, "child speak");
 menuMiscInferIndent = CreateMenuItem("Infer Indent", "Alt+OemCloseBrackets", menuItem_Click, "child silent");
-menuMiscFormatCode = CreateMenuItem("Format Code", "Control+D4", menuItem_Click, "child speak");
+// Moved off Control+D4 so Control+1..9 can walk the open windows, on
+// Kasperczak's authorization (Telegram 14.08.2026 22:35).
+menuMiscFormatCode = CreateMenuItem("Format Code", "Control+Shift+F6", menuItem_Click, "child speak");
 menuMiscRepeatLine = CreateMenuItem("Repeat Line", "Control+Y", menuItem_Click, "child speak");
 menuMiscSectionBreak = CreateMenuItem("Section Break", "Control+Enter", menuItem_Click, "child speak");
 menuMiscPathToClipboard = CreateMenuItem("Path to Clipboard", "Alt+Shift+P", menuItem_Click, "child speak");
@@ -8403,9 +8412,10 @@ if (keyData != Keys.Enter && hashKey.ContainsKey(keyData)) return false;
 		// just the tabs that happen to be open now.
 		// Chords: Control+1..Control+9 only.  Control+0 is NOT claimed, because
 		// Control+D0 is Go to Folder in stock EdSharp; there is also no tenth
-		// tab slot in what he asked for.  Control+4 and Control+6 stay with
-		// Format Code and Next Baseline -- the guard below yields to them, so
-		// those two digits do not navigate windows.  Reported to him.
+		// tab slot in what he asked for.  Control+4 and Control+6 now navigate
+		// too: he authorized moving the two commands that held them (Telegram
+		// 14.08.2026 22:35, "Przenies. CTRL-1-9 opening files tab"), so Format
+		// Code went to Control+Shift+F6 and Next Baseline to Control+F2.
 		private bool HandleWindowNumberKey(Keys keyData) {
 		if ((keyData & Keys.Control) != Keys.Control) return false;
 		if ((keyData & Keys.Alt) == Keys.Alt) return false;
