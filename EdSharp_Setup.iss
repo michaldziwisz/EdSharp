@@ -76,7 +76,13 @@ Source: "EdSharp.nvda-addon"; DestDir: "{app}"; Flags: ignoreversion skipifsourc
 Source: "EdSharpNG-spellcheck.nvda-addon"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 ; Configuration: do not clobber a user's existing settings on upgrade.
 Source: "EdSharp.ini";        DestDir: "{app}"; Flags: onlyifdoesntexist
-Source: "Hotkeys.ini";        DestDir: "{app}"; Flags: onlyifdoesntexist
+; Hotkeys.ini holds ONLY the command descriptions spoken by Key Describer and
+; the Hotkey Summary -- the old per-item [Keys] rebinding was removed, so this
+; is a program resource, not user config.  It MUST be refreshed on upgrade,
+; otherwise an existing install keeps announcing chords that have moved.
+Source: "Hotkeys.ini";        DestDir: "{app}"; Flags: ignoreversion
+; Hotkey Summary (Alt+Shift+H) opens this file from the program directory.
+Source: "HotKeys.txt";        DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 ; Documentation.
 Source: "EdSharp.md";         DestDir: "{app}"; Flags: ignoreversion
 Source: "EdSharp.htm";        DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist

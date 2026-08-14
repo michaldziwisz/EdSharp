@@ -56,7 +56,7 @@ As usual, Control+A selects all text.  Control+Shift+A clears any selection.  Pr
 
 Press Control+Space to select a chunk of text at the cursor position.  A chunk is defined as a contiguous sequence of non-space characters.  It may be more than what the hotkey Control+Shift+RightArrow selects, since such word movement commands stop at punctuation marks.  Press Control+Space again to extend the selection to the next chunk.
 
-The Append From Clipboard command, Alt+7 (associate append with the ampersand character), is like the "paste board" feature of the NoteTab editor.  When this mode is toggled on for a document, each snippet of text copied to the Windows clipboard -- whether from another application or from a different document open in EdSharp -- will also be pasted into the collecting document, which will then automatically be saved to disk.  EdSharp beeps to confirm this is happening.  Text copied within the collecting document itself is not appended, so copying part of that document does not copy it back into itself.  Snippets are separated by a section break sequence, which makes it possible to navigate among them with the Control+PageDown and Control+PageUp commands.  Thus the feature may be used to conveniently collect and save information from applications that do not have a built-in appending mechanism.  When done, toggle off the mode with the same command, Alt+7.
+The Append From Clipboard command, Alt+F9, is like the "paste board" feature of the NoteTab editor.  When this mode is toggled on for a document, each snippet of text copied to the Windows clipboard -- whether from another application or from a different document open in EdSharp -- will also be pasted into the collecting document, which will then automatically be saved to disk.  EdSharp beeps to confirm this is happening.  Text copied within the collecting document itself is not appended, so copying part of that document does not copy it back into itself.  Snippets are separated by a section break sequence, which makes it possible to navigate among them with the Control+PageDown and Control+PageUp commands.  Thus the feature may be used to conveniently collect and save information from applications that do not have a built-in appending mechanism.  When done, toggle off the mode with the same command, Alt+F9.
 
 Press Control+Z to undo the last editing operation, or Control+Shift+Z to redo it.
 
@@ -152,6 +152,8 @@ Use the Open Again command, Alt+O, to reload the current file from disk.  Press 
 ### Handling Favorite Files and Bookmark Positions
 Press Control+L to add the current file to the list of favorites.  Press Control+Shift+L to remove it from that list.  Press Alt+L to list favorites and open one.  If a bookmark is set, EdSharp automatically goes to it and says the percent position in the document.  Also, if the word wrap or guard setting is different than when the file was designated as a favorite, EdSharp restores that setting and says so.  This command opens a file verbatim, assuming that you had set it as a favorite to edit it literally, e.g., a .htm file you are developing.  When a file is opened from Windows Explorer or the recent files list, on the other hand, EdSharp automatically converts it to plain text if an import converter is configured for its extension.
 
+File slots give ten numbered shortcuts to the files you return to most often.  Press Alt+Shift and a digit to assign the current file to that slot; EdSharp confirms, for example, "Slot 3 is notes.md".  Press Alt and the same digit to open it again later, or to move to its window if the file is already open.  The digits 1 through 9 are slots 1 through 9, and 0 is slot 10, matching the order of the keys on the keyboard.  The numeric keypad works too.  An empty slot says "Slot 3 is empty!", and a file that has since been moved or deleted says "Slot 3 file not found!".  Assignments are stored on disk, so they survive restarting EdSharp.  A document that has never been saved cannot be assigned, since there is no file to remember.  To review the slots you have set, use the File Slots command, Alt+Shift+F2, which lists each assigned slot with its key and file name.
+
 Press Control+K to set a bookmark at the cursor position.  If the current file has a single bookmark, Alt+K goes to it.  If more than one, a list of bookmarked lines is presented, with focus on the next one ahead of the cursor position.  Thus you can sequentially visit bookmarks by pressing Alt+K and Enter.  Control+Shift+K clears a bookmark at the cursor position.  To clear all bookmarks at once, press Control+Shift+L to remove the file from the list of favorites -- since a bookmarked file is automatically considered a favorite.  If you want to keep the favorite status without any bookmarks, then press Control+L to set the file as a favorite again.  EdSharp tracks and restores the bookmark, word wrap, and guard settings of each file opened.
 
 ### Saving
@@ -171,7 +173,7 @@ Use the Mail command, Control+M, to send the current file as the body of a messa
 
 Press Alt+Backslash to open Windows Explorer in the directory containing the current file, or Control+Backslash to open a command prompt there.  Besides the current folder as the default to open, the intervening dialog also lets you open the EdSharp program folder, data folder, or snippet folder.  It also lets you create a new folder on disk.  
 
-Press Alt+0 to verify the current compiler and folder of EdSharp.  Control+0 lets you change the current folder to one containing recent or favorite files, which are put in a list.  Press Control+Shift+0 to change to a special folder of Windows, e.g., My Documents.  These commands may be more efficient than navigating the standard Windows open file dialog, invoked with Control+O.
+Press Control+F9 to verify the current compiler and folder of EdSharp.  Control+0 lets you change the current folder to one containing recent or favorite files, which are put in a list.  Press Control+Shift+0 to change to a special folder of Windows, e.g., My Documents.  These commands may be more efficient than navigating the standard Windows open file dialog, invoked with Control+O.
 
 ## Invoking Snippets
 Press Alt+S to save all or selected text to a file that may be conveniently pasted into other documents.  You may give the file a descriptive name and an extension appropriate for its content.  It is saved in a subfolder of the EdSharp data folder.  Each programming compiler or interpreter may have its own set of snippets.  The subfolder name is the same as the current value of the Pick Compiler command, Control+Shift+F5.  If no compiler has been chosen, the "Default" subfolder is used.
@@ -364,7 +366,7 @@ Extra speech messages may be toggled off -- or reactivated -- with Control+Shift
 
 With the optional JAWS scripts, you can toggle a speech setting of reading all or no punctuation using JAWSKey plus the grave accent at the top left of the main keypad (U.S. keyboard).  All punctuation is useful when reading carefully for details whereas no punctuation is useful when reading quickly for concepts.
 
-Press Control+W to turn word wrap on, or Control+Shift+W to turn it off.  Use the Guard Document command, Control+F7, to make the document read-only, preventing accidental modifications.  Control+Shift+F7 drops this protection.  Wrap and guard settings are restored the next time a file is opened.
+Press Control+F12 to turn word wrap on, or Control+Shift+W to turn it off.  Use the Guard Document command, Control+F7, to make the document read-only, preventing accidental modifications.  Control+Shift+F7 drops this protection.  Wrap and guard settings are restored the next time a file is opened.
 
 EdSharp checks whether the file in the current editing window has been modified by another program since being loaded from disk.  If so, you are prompted whether to open it again (like what Alt+O does manually).  If you answer No, version checking on the current file stops until you save or reload it.
 
@@ -482,9 +484,9 @@ A command without a hot key may still be invoked via the regular menu system or 
 
 Certain configuration options are associated with the current compiler rather than being global .  Specifically, favorites, bookmarks, and user-defined tokens apply to the current compiler (picked via Control+Shift+F5), so you can work with items more relevant to each coding project.  The Reset Configuration command, Alt+Shift+0, lets you easily remove custom settings and restore defaults of EdSharp.  This command lets you choose whether to reset the main configuration, current compiler configuration, or create a new compiler configuration.  The New choice prompts for the compiler name, command line, AbbreviateOutput, NavigatePart, QuotePrefix, and ExtensionDefault settings.  
 
-A compiler configuration file is stored in the EdSharp data folder in a file having the compiler name and a .ini extension.  For example, if you created settings for the "Delphi" compiler, EdSharp would create a Delphi entry in the Compilers section of EdSharp.ini, and then store related favorites, bookmarks, and user-defined tokens in Delphi.ini.  Press Alt+0 to query the current compiler and directory.
+A compiler configuration file is stored in the EdSharp data folder in a file having the compiler name and a .ini extension.  For example, if you created settings for the "Delphi" compiler, EdSharp would create a Delphi entry in the Compilers section of EdSharp.ini, and then store related favorites, bookmarks, and user-defined tokens in Delphi.ini.  Press Control+F9 to query the current compiler and directory.
 
-Press F4 to activate an editing window from a list of those currently open.  Press Control+F4 to close the current window, or Control+Shift+F4 to close all windows except the current one.  EdSharp windows may be visually organized according to common MDI (multiple document interface) patterns.  The Window menu includes the following commands:  Arrange Icons, Alt+F11; Cascade, Control+F11; Tile Horizontal, Alt+Shift+F11; and Tile Vertical, Control+Shift+F11.
+Press F4 to activate an editing window from a list of those currently open.  Press Control+F4, or Control+W, to close the current window, or Control+Shift+F4 to close all windows except the current one.  EdSharp windows may be visually organized according to common MDI (multiple document interface) patterns.  The Window menu includes the following commands:  Arrange Icons, Alt+F11; Cascade, Control+F11; Tile Horizontal, Alt+Shift+F11; and Tile Vertical, Control+Shift+F11.
 
 Use the Alternate Menu command, Alt+F10, to execute a command from a single, alphebetized list.
 
@@ -556,7 +558,7 @@ Cut Append=Alt+X, Cut and append selected text to clipboard, or cut and append c
 
 Paste=Control+V, Paste text from clipboard
 Paste File=Control+Shift+V, Insert another file at cursor position
-Append from Clipboard=Alt+7, Toggle a mode in which text copied to the clipboard is also saved to a file
+Append from Clipboard=Alt+F9, Toggle a mode in which text copied to the clipboard is also saved to a file
 Undo=Control+Z, Undo the last editing action
 Redo=Control+Shift+Z, Redo the last action that was undone
 
@@ -579,7 +581,7 @@ Reverse Find at Cursor=Alt+Shift+F3, Search backward for chunk or selected text
 Forward Find Again=F3, Search forward for next match
 Reverse Find Again=Shift+F3, Search backward for previous match
 
-Word Wrap=Control+W, Word wrap lines
+Word Wrap=Control+F12, Word wrap lines
 Unwrap=Control+Shift+W, Unwrap lines
 Guard Document=Control+F7, Make document read-only
 No Guard=Control+Shift+F7, Clear read-only status
@@ -602,6 +604,9 @@ Set Favorite=Control+L, Add current file to the list of favorites
 Clear Favorite=Control+Shift+L, Clear current file from the list of favorites
 List Favorites=Alt+L, Open a file from the list of favorites
 Recent Files=Alt+R, Open a file from the list of those recently used
+File Slots=Alt+Shift+F2, Open a file from the list of numbered file slots
+Open File Slot=Alt+digit, Open the file assigned to that slot, Alt+1 to Alt+9 and Alt+0 for slot 10
+Assign File Slot=Alt+Shift+digit, Assign the current file to that slot
 
 New=Control+N, Open a new editing window
 New from Clipboard=Control+Shift+N, Open a new editing window containing clipboard text
@@ -628,7 +633,7 @@ Prompt Command=Alt+F5, Prompt for a command line to execute and say its standard
 Review Output=Alt+Shift+F5, Open standard output of last prompt or compile command in a new editing window
 Compile=Control+F5, Compile source code, say output, and jump to error position
 Pick Compiler=Control+Shift+F5, Pick a compiler or interpreter from the list of those configured
-Say Compiler=Alt+0, Say current compiler and folder
+Say Compiler=Control+F9, Say current compiler and folder
 Go to Folder=Control+0, Go to folder containing recent or favorite files
 Go to Special Folder=Control+Shift+0, Go to special folder of Windows
 Go to Environment=Control+Shift+G, Go to interactive environment of current compiler
@@ -749,7 +754,7 @@ Next Window=Control+Tab, Cycle to next editing window
 Prior Window=Control+Shift+Tab, Cycle to previous editing window
 Windows Open=Shift+F4, Say titles of current editing windows
 Current Windows=F4, Activate an editing window from a list of those currently open
-Close Window=Control+F4, Close current editing window
+Close Window=Control+F4, Close current editing window, also on Control+W
 Close All but Current Window=Control+Shift+F4, Close all editing windows except the current one
 Exit EdSharp=Alt+F4, Exit the EdSharp application
 
