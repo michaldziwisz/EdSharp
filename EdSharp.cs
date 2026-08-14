@@ -842,7 +842,7 @@ public static string EOD = LB + DD + LB + "End of Document" + LB;
 
 public static Dictionary<Keys, ToolStripMenuItem> hashKey = new Dictionary<Keys, ToolStripMenuItem>();
 public MenuStrip menuMain;
-public ToolStripMenuItem menuFile, menuFileNew, menuFileNewFromClipboard, menuFileOpen, menuFileOpenOtherFormat, menuFileOpenAgain, menuFileRecent, menuFileSetFavorite, menuFileClearFavorite, menuFileListFavorites, menuFileFind, menuFileSave, menuFileSaveAs, menuFileSaveCopy, menuFileExport, menuFileRename, menuFileProperties, menuFileMailBody, menuFileMailAttach, menuFilePrint, menuFileRun, menuFileCurrentWindows, menuFileClose, menuFileCloseAllButCurrentWindow, menuFileExit;
+public ToolStripMenuItem menuFile, menuFileNew, menuFileNewFromClipboard, menuFileOpen, menuFileOpenOtherFormat, menuFileOpenAgain, menuFileRecent, menuFileSetFavorite, menuFileClearFavorite, menuFileListFavorites, menuFileFind, menuFileSave, menuFileSaveAs, menuFileSaveCopy, menuFileExport, menuFileRename, menuFileProperties, menuFileMailBody, menuFileMailAttach, menuFilePrint, menuFileRun, menuFileCurrentWindows, menuFileClose, menuFileCloseAllButCurrentWindow, menuFileSlots, menuFileExit;
 public ToolStripMenuItem menuEdit, menuEditSelectAll, menuEditUnselectAll, menuEditCopy, menuEditCopyAppend, menuEditCopyRichText, menuEditCut, menuEditCutAppend, menuEditPaste, menuEditPasteFile, menuEditUndo, menuEditRedo, menuEditStartSelection, menuEditCompleteSelection, menuEditReselect, menuEditCopyAll, menuEditSelectChunk, menuEditAppendFromClipboard, menuEditQuote, menuEditUnquote, menuEditUpperCase, menuEditLowerCase, menuEditProperCase, menuEditSwapCase, menuEditYieldEncoding, menuEditJoinLines, menuEditHardLineBreak, menuEditEnterNewLine, menuEditIndentNewLine, menuEditIndentNewLinePrior, menuEditIndent, menuEditOutdent, menuEditAlign, menuEditIndentMode, menuEditJustify, menuEditStyle, menuEditBaseline, menuEditSetSelectionFont;
 public ToolStripMenuItem menuDelete, menuDeleteReplaceRegular, menuDeleteReplaceWithRegExp, menuDeleteHardLine, menuDeleteParagraph, menuDeleteLine, menuDeleteRight, menuDeleteLeft, menuDeleteDown, menuDeleteUp, menuDeleteFile, menuDeleteTrimBlanks;
 public ToolStripMenuItem menuNavigate, menuNavigateForwardFind, menuNavigateReverseFind, menuNavigateForwardFindWithRegExp, menuNavigateReverseFindWithRegExp,  menuNavigateForwardFindAtCursor, menuNavigateReverseFindAtCursor, menuNavigateForwardFindAgain, menuNavigateReverseFindAgain, menuNavigateJumpToLine, menuNavigateJumpToLineAgain, menuNavigateGoToPercent, menuNavigateGoToPercentAgain, menuNavigateGoToPart, menuNavigateSetBookmark, menuNavigateClearBookmark, menuNavigateGoToBookmark, menuNavigateHomeCharacter, menuNavigateEndCharacter, menuNavigateStartTag, menuNavigateEndTag,  menuNavigateNextJustify, menuNavigatePriorJustify, menuNavigateNextStyle, menuNavigatePriorStyle, menuNavigateNextBaseline, menuNavigatePriorBaseline, menuNavigateNextFont, menuNavigatePriorFont, menuNavigateRightBrace, menuNavigateNextBlock, menuNavigatePriorBlock, menuNavigateLeftBrace, menuNavigateNextIndent, menuNavigatePriorIndent, menuNavigateNextChunk,  menuNavigatePriorChunk, menuNavigateNextSentence, menuNavigatePriorSentence, menuNavigateNextParagraph, menuNavigatePriorParagraph, menuNavigateNextPart, menuNavigatePriorPart, menuNavigateNextSection, menuNavigatePriorSection, menuNavigateGoToSection, menuNavigateGoToContents, menuNavigateSearchForTopic, menuNavigateSearchForTopicAgain, menuNavigateGoToStartOfSelection, menuNavigateNextBookmark, menuNavigatePriorBookmark;
@@ -884,9 +884,17 @@ menuFilePrint = CreateMenuItem("&Print", "Control+P", menuItem_Click, "child sil
 menuFileRun = CreateMenuItem("Run", "F5", menuItem_Click, "child speak");
 menuFileCurrentWindows = CreateMenuItem("Current Windows ...", "F4", menuItem_Click, "frame silent");
 menuFileClose = CreateMenuItem("&Close Window", "Control+F4", menuItem_Click, "child speak");
+// Control+W is an ADDITIONAL chord for Close Window (Kasperczak, 13.08.2026);
+// Control+F4 above stays as it was.  A menu item can register only one chord,
+// so the extra one is dispatched in HandleCloseWindowKey.
+
 menuFileCloseAllButCurrentWindow = CreateMenuItem("Close All but Current Window", "Control+Shift+F4", menuItem_Click, "child speak");
+// File Slots: Alt+digit opens the file remembered in that slot, Alt+Shift+digit
+// assigns the current file to it (see HandleFileSlotKey).  This menu item lists
+// the slots so the feature is discoverable with a screen reader.
+menuFileSlots = CreateMenuItem("File Slots ...", "Alt+Shift+F2", menuItem_Click, "frame silent");
 menuFileExit = CreateMenuItem("&E&xit EdSharp", "Alt+F4", menuItem_Click, "frame speak");
-menuFile.DropDownItems.AddRange(new ToolStripItem[] {menuFileNew, menuFileNewFromClipboard, menuFileOpen, menuFileOpenOtherFormat, menuFileOpenAgain, menuFileRecent, menuFileSetFavorite, menuFileClearFavorite, menuFileListFavorites, menuFileFind, menuFileSave, menuFileSaveAs, menuFileSaveCopy, menuFileExport, menuFileRename, menuFileProperties, menuFileMailBody, menuFileMailAttach, menuFilePrint, menuFileRun, menuFileCurrentWindows, menuFileClose, menuFileCloseAllButCurrentWindow, menuFileExit});
+menuFile.DropDownItems.AddRange(new ToolStripItem[] {menuFileNew, menuFileNewFromClipboard, menuFileOpen, menuFileOpenOtherFormat, menuFileOpenAgain, menuFileRecent, menuFileSetFavorite, menuFileClearFavorite, menuFileListFavorites, menuFileFind, menuFileSave, menuFileSaveAs, menuFileSaveCopy, menuFileExport, menuFileRename, menuFileProperties, menuFileMailBody, menuFileMailAttach, menuFilePrint, menuFileRun, menuFileCurrentWindows, menuFileClose, menuFileCloseAllButCurrentWindow, menuFileSlots, menuFileExit});
 //Dialog.Show("File.", menuFile.DropDownItems.Count);
 
 menuEdit = CreateMenu("&Edit");
@@ -906,7 +914,11 @@ menuEditCompleteSelection = CreateMenuItem("Complete Selection", "Shift+F8", men
 menuEditReselect = CreateMenuItem("Reselect", "Control+Shift+F8", menuItem_Click, "child speak");
 menuEditCopyAll = CreateMenuItem("Copy All", "Control+F8", menuItem_Click, "child speak");
 menuEditSelectChunk = CreateMenuItem("Select Chunk", "Control+Space", menuItem_Click, "child silent");
-menuEditAppendFromClipboard = CreateMenuItem("Append from Clipboard", "Alt+D7", menuItem_Click, "child silent");
+// Alt+D7 was freed for the File Slot commands (Alt+7 opens file slot 7), on
+// Kasperczak's explicit authorization of that collision.  Moved to a free
+// chord that does NOT involve Control+Alt, since Util.Say() suppresses speech
+// while both Alt and Control are held.
+menuEditAppendFromClipboard = CreateMenuItem("Append from Clipboard", "Alt+F9", menuItem_Click, "child silent");
 menuEditQuote = CreateMenuItem("&Quote", "Control+Q", menuItem_Click, "child speak");
 menuEditUnquote = CreateMenuItem("Unquote", "Control+Shift+Q", menuItem_Click, "child speak");
 menuEditUpperCase = CreateMenuItem("&Upper Case", "Control+U", menuItem_Click, "child speak");
@@ -1013,7 +1025,8 @@ menuQueryPath = CreateMenuItem("Path", "Alt+P", menuItem_Click, "child silent");
 menuQueryTopic = CreateMenuItem("Topic", "Alt+T", menuItem_Click, "child speak");
 menuQueryYield = CreateMenuItem("Yield", "Alt+Y", menuItem_Click, "child speak");
 menuQueryStatus = CreateMenuItem("Status", "Alt+Z", menuItem_Click, "child silent");
-menuQueryCompiler = CreateMenuItem("Compiler", "Alt+D0", menuItem_Click, "frame silent");
+// Alt+D0 was freed for the File Slot commands (Alt+0 opens file slot 10).
+menuQueryCompiler = CreateMenuItem("Compiler", "Control+F9", menuItem_Click, "frame silent");
 menuQuerySelected = CreateMenuItem("Selected", "Shift+Space", menuItem_Click, "child silent");
 menuQueryChunk = CreateMenuItem("Chunk", "Shift+Back", menuItem_Click, "child silent");
 menuQueryReadAll = CreateMenuItem("Read All", "Alt+F8", menuItem_Click, "child speak");
@@ -1032,7 +1045,9 @@ menuMiscManualOptions = CreateMenuItem("Manual Options", "Alt+Shift+M", menuItem
 menuMiscResetConfiguration = CreateMenuItem("Reset Configuration", "Alt+Shift+D0", menuItem_Click, "frame silent");
 menuMiscGoToFolder = CreateMenuItem("Go to Folder", "Control+D0", menuItem_Click, "frame silent");
 menuMiscGoToSpecialFolder = CreateMenuItem("Go to Special Folder", "Control+Alt+D0", menuItem_Click, "frame silent");
-menuMiscWordWrap = CreateMenuItem("&Word Wrap", "Control+W", menuItem_Click, "child speak");
+// Control+W was freed to become an additional Close Window chord.  Unwrap
+// keeps Control+Shift+W, so the pair is no longer symmetric -- deliberate.
+menuMiscWordWrap = CreateMenuItem("&Word Wrap", "Control+F12", menuItem_Click, "child speak");
 menuMiscUnwrap = CreateMenuItem("Unwrap", "Control+Shift+W", menuItem_Click, "child speak");
 menuMiscExtraSpeechToggle = CreateMenuItem("Extra Speech Toggle", "Control+Shift+X", menuItem_Click, "frame silent");
 menuMiscExtraSpeechLog = CreateMenuItem("Extra Speech Log", "Alt+Shift+X", menuItem_Click, "frame speak");
@@ -1213,6 +1228,8 @@ this.KeyIndex = iIndex;
 //Clipboard.SetText(Clipboard.GetText() + keyData.ToString() + "\r\n");
 // Util.Say("Repeat " + this.KeyRepeat);
 
+if (HandleFileSlotKey(keyData)) return true;
+if (HandleCloseWindowKey(keyData)) return true;
 if (HandleSectionMoveKey(keyData)) return true;
 // Markdown review (preview) mode: Escape toggles it on .md files; while
 // active, navigation/elements-list keys are handled here, and arrow keys
@@ -2191,6 +2208,10 @@ Dialog.Properties(sFile);
 
 if (menuItem == menuFileCurrentWindows) {
 CurrentWindows();
+}
+
+if (menuItem == menuFileSlots) {
+PickFileSlot();
 }
 
 if (menuItem == menuFileClose) {
@@ -8315,6 +8336,127 @@ if (keyData != Keys.Enter && hashKey.ContainsKey(keyData)) return false;
 		MoveCurrentSection(child.RTB, keyCode == Keys.Up);
 		return true;
 		} // HandleSectionMoveKey method
+
+		// File Slots -- Alt+digit opens the file assigned to that slot,
+		// Alt+Shift+digit assigns the current file to it.  Requested by
+		// Kasperczak as a regression from EdSharp 4 (Telegram 13.08.2026).
+		// Slots live in the INI section "FileSlots" under keys 1..10, so they
+		// survive restarts.  Digit 0 is slot 10 (the keyboard order 1..9,0).
+		// Both the top-row digits and the numeric keypad are accepted.
+		// NOTE: Alt+7 / Alt+0 / Alt+Shift+0 previously belonged to other
+		// commands; those were moved to free chords on his explicit
+		// authorization.  Alt+Shift+6 (Baseline) is deliberately NOT claimed
+		// here -- it stays with Baseline until he decides otherwise, so
+		// assigning to slot 6 is the one gap in the range.
+		private const string c_sFileSlotSection = "FileSlots";
+
+		private bool HandleFileSlotKey(Keys keyData) {
+		if ((keyData & Keys.Alt) != Keys.Alt) return false;
+		if ((keyData & Keys.Control) == Keys.Control) return false;
+		bool bAssign = ((keyData & Keys.Shift) == Keys.Shift);
+
+		Keys keyCode = keyData & Keys.KeyCode;
+		int iDigit = -1;
+		if (keyCode >= Keys.D0 && keyCode <= Keys.D9) iDigit = (int) keyCode - (int) Keys.D0;
+		else if (keyCode >= Keys.NumPad0 && keyCode <= Keys.NumPad9) iDigit = (int) keyCode - (int) Keys.NumPad0;
+		else return false;
+
+		// Keyboard order: 1..9 are slots 1..9, and 0 is slot 10.
+		int iSlot = (iDigit == 0) ? 10 : iDigit;
+
+		// Yield to any command still holding this chord (Alt+Shift+D6 =
+		// Baseline), so we never silently shadow an existing hotkey.
+		if (hashKey.ContainsKey(keyData)) return false;
+
+		if (this.KeyDescriber) {
+		AddMessage((bAssign ? "Assign file slot " : "Open file slot ") + iSlot);
+		return true;
+		}
+
+		if (bAssign) AssignFileSlot(iSlot);
+		else OpenFileSlot(iSlot);
+		return true;
+		} // HandleFileSlotKey method
+
+		// Control+W = Close Window, an additional chord alongside Control+F4.
+		// In stock EdSharp Control+W was Word Wrap; that command was moved to
+		// Control+F12 on Kasperczak's explicit authorization.
+		private bool HandleCloseWindowKey(Keys keyData) {
+		if (keyData != (Keys.Control | Keys.W)) return false;
+		if (hashKey.ContainsKey(keyData)) return false;
+
+		if (this.KeyDescriber) {
+		AddMessage("Close Window");
+		return true;
+		}
+
+		MdiChild child = this.Child;
+		if (child == null) return true;
+		SetMessage("Close Window");
+		CloseWindow(child);
+		return true;
+		} // HandleCloseWindowKey method
+
+
+		// Assign the current document to a slot.  Requires a real file on
+		// disk: an unsaved NoName window has nothing to remember.
+		private void AssignFileSlot(int iSlot) {
+		MdiChild child = this.Child;
+		string sFile = (child == null) ? "" : child.File;
+		if (sFile.Length == 0 || !sFile.Contains(@"\")) {
+		AddMessage("No disk file is open for this command!");
+		return;
+		}
+
+		App.WriteValue(c_sFileSlotSection, iSlot.ToString(), sFile);
+		AddMessage("Slot " + iSlot + " is " + Path.GetFileName(sFile));
+		} // AssignFileSlot method
+
+		// Open (or activate, if already open) the file remembered in a slot.
+		private void OpenFileSlot(int iSlot) {
+		string sFile = App.ReadValue(c_sFileSlotSection, iSlot.ToString(), "");
+		sFile = Util.Unquote(sFile).Trim();
+		if (sFile.Length == 0) {
+		AddMessage("Slot " + iSlot + " is empty!");
+		return;
+		}
+
+		if (!File.Exists(sFile)) {
+		AddMessage("Slot " + iSlot + " file not found!");
+		return;
+		}
+
+		OpenOrActivateWindow(sFile, 0);
+		} // OpenFileSlot method
+
+		// The File Slots menu item: lists every assigned slot so the feature is
+		// discoverable, and opens the one chosen.
+		private void PickFileSlot() {
+		List<string> lsValue = new List<string>();
+		List<string> lsDisplay = new List<string>();
+		for (int i = 1; i <= 10; i++) {
+		string sFile = Util.Unquote(App.ReadValue(c_sFileSlotSection, i.ToString(), "")).Trim();
+		if (sFile.Length == 0) continue;
+		int iKey = (i == 10) ? 0 : i;
+		lsValue.Add(sFile);
+		lsDisplay.Add("Alt+" + iKey + "   " + Path.GetFileName(sFile) + "   " + sFile);
+		}
+
+		if (lsValue.Count == 0) {
+		AddMessage("No file slots are assigned!");
+		return;
+		}
+
+		string sPick = Dialog.Pick("File Slots", lsValue.ToArray(), lsDisplay.ToArray(), false, 0);
+		if (sPick.Length == 0) return;
+		if (!File.Exists(sPick)) {
+		AddMessage("File not found!");
+		return;
+		}
+
+		OpenOrActivateWindow(sPick, 0);
+		} // PickFileSlot method
+
 
 			private void MoveCurrentSection(HomerRichTextBox rtb, bool bUp) {
 			if (rtb == null) return;
