@@ -845,7 +845,7 @@ public MenuStrip menuMain;
 public ToolStripMenuItem menuFile, menuFileNew, menuFileNewFromClipboard, menuFileOpen, menuFileOpenOtherFormat, menuFileOpenAgain, menuFileRecent, menuFileSetFavorite, menuFileClearFavorite, menuFileListFavorites, menuFileFind, menuFileSave, menuFileSaveAs, menuFileSaveCopy, menuFileExport, menuFileRename, menuFileProperties, menuFileMailBody, menuFileMailAttach, menuFilePrint, menuFileRun, menuFileCurrentWindows, menuFileClose, menuFileCloseAllButCurrentWindow, menuFileExit;
 public ToolStripMenuItem menuEdit, menuEditSelectAll, menuEditUnselectAll, menuEditCopy, menuEditCopyAppend, menuEditCopyRichText, menuEditCut, menuEditCutAppend, menuEditPaste, menuEditPasteFile, menuEditUndo, menuEditRedo, menuEditStartSelection, menuEditCompleteSelection, menuEditReselect, menuEditCopyAll, menuEditSelectChunk, menuEditAppendFromClipboard, menuEditQuote, menuEditUnquote, menuEditUpperCase, menuEditLowerCase, menuEditProperCase, menuEditSwapCase, menuEditYieldEncoding, menuEditJoinLines, menuEditHardLineBreak, menuEditEnterNewLine, menuEditIndentNewLine, menuEditIndentNewLinePrior, menuEditIndent, menuEditOutdent, menuEditAlign, menuEditIndentMode, menuEditJustify, menuEditStyle, menuEditBaseline, menuEditSetSelectionFont;
 public ToolStripMenuItem menuDelete, menuDeleteReplaceRegular, menuDeleteReplaceWithRegExp, menuDeleteHardLine, menuDeleteParagraph, menuDeleteLine, menuDeleteRight, menuDeleteLeft, menuDeleteDown, menuDeleteUp, menuDeleteFile, menuDeleteTrimBlanks;
-public ToolStripMenuItem menuNavigate, menuNavigateForwardFind, menuNavigateReverseFind, menuNavigateForwardFindWithRegExp, menuNavigateReverseFindWithRegExp,  menuNavigateForwardFindAtCursor, menuNavigateReverseFindAtCursor, menuNavigateForwardFindAgain, menuNavigateReverseFindAgain, menuNavigateJumpToLine, menuNavigateJumpToLineAgain, menuNavigateGoToPercent, menuNavigateGoToPercentAgain, menuNavigateGoToPart, menuNavigateSetBookmark, menuNavigateClearBookmark, menuNavigateGoToBookmark, menuNavigateHomeCharacter, menuNavigateEndCharacter, menuNavigateStartTag, menuNavigateEndTag,  menuNavigateNextJustify, menuNavigatePriorJustify, menuNavigateNextStyle, menuNavigatePriorStyle, menuNavigateNextBaseline, menuNavigatePriorBaseline, menuNavigateNextFont, menuNavigatePriorFont, menuNavigateRightBrace, menuNavigateNextBlock, menuNavigatePriorBlock, menuNavigateLeftBrace, menuNavigateNextIndent, menuNavigatePriorIndent, menuNavigateNextChunk,  menuNavigatePriorChunk, menuNavigateNextSentence, menuNavigatePriorSentence, menuNavigateNextParagraph, menuNavigatePriorParagraph, menuNavigateNextPart, menuNavigatePriorPart, menuNavigateNextSection, menuNavigatePriorSection, menuNavigateGoToSection, menuNavigateGoToContents, menuNavigateSearchForTopic, menuNavigateSearchForTopicAgain, menuNavigateGoToStartOfSelection;
+public ToolStripMenuItem menuNavigate, menuNavigateForwardFind, menuNavigateReverseFind, menuNavigateForwardFindWithRegExp, menuNavigateReverseFindWithRegExp,  menuNavigateForwardFindAtCursor, menuNavigateReverseFindAtCursor, menuNavigateForwardFindAgain, menuNavigateReverseFindAgain, menuNavigateJumpToLine, menuNavigateJumpToLineAgain, menuNavigateGoToPercent, menuNavigateGoToPercentAgain, menuNavigateGoToPart, menuNavigateSetBookmark, menuNavigateClearBookmark, menuNavigateGoToBookmark, menuNavigateHomeCharacter, menuNavigateEndCharacter, menuNavigateStartTag, menuNavigateEndTag,  menuNavigateNextJustify, menuNavigatePriorJustify, menuNavigateNextStyle, menuNavigatePriorStyle, menuNavigateNextBaseline, menuNavigatePriorBaseline, menuNavigateNextFont, menuNavigatePriorFont, menuNavigateRightBrace, menuNavigateNextBlock, menuNavigatePriorBlock, menuNavigateLeftBrace, menuNavigateNextIndent, menuNavigatePriorIndent, menuNavigateNextChunk,  menuNavigatePriorChunk, menuNavigateNextSentence, menuNavigatePriorSentence, menuNavigateNextParagraph, menuNavigatePriorParagraph, menuNavigateNextPart, menuNavigatePriorPart, menuNavigateNextSection, menuNavigatePriorSection, menuNavigateGoToSection, menuNavigateGoToContents, menuNavigateSearchForTopic, menuNavigateSearchForTopicAgain, menuNavigateGoToStartOfSelection, menuNavigateNextBookmark, menuNavigatePriorBookmark;
 public ToolStripMenuItem menuQuery, menuQueryAddress, menuQueryBraces, menuQueryBlock, menuQueryIndent, menuQueryPath, menuQueryTopic, menuQueryYield, menuQueryStatus, menuQueryCompiler, menuQuerySelected, menuQueryChunk, menuQueryReadAll, menuQueryWindowsOpen, menuQueryClipboard, menuQueryTime, menuQueryStyles, menuQueryFont;
 public ToolStripMenuItem menuMisc, menuMiscSetDefaultFont, menuMiscConfigurationOptions, menuMiscManualOptions, menuMiscResetConfiguration, menuMiscGoToFolder, menuMiscGoToSpecialFolder, menuMiscWordWrap, menuMiscUnwrap, menuMiscExtraSpeechToggle, menuMiscExtraSpeechLog, menuMiscEnvironmentVariables, menuMiscSpellCheck, menuMiscThesaurus, menuMiscLookupTerm, menuMiscTranslateLanguage, menuMiscGuardDocument, menuMiscNoGuard, menuMiscPyBrace, menuMiscPyDent, menuMiscInferIndent, menuMiscFormatCode, menuMiscRepeatLine, menuMiscSectionBreak, menuMiscPathToClipboard, menuMiscPathList, menuMiscInsertTime, menuMiscCalculateDate, menuMiscTextConvert, menuMiscTextCombine, menuMiscTextContents, menuMiscYieldWithRegExp, menuMiscExtractWithRegExp, menuMiscRunAtCursor, menuMiscSpecialCharacter, menuMiscEvaluateExpression, menuMiscReplaceTokens, menuMiscTransformFiles, menuMiscGoToEnvironment, menuMiscCompile, menuMiscPickCompiler, menuMiscPromptCommand, menuMiscReviewOutput, menuMiscSaveSnippet, menuMiscInvokeSnippet, menuMiscViewSnippet, menuMiscKeepUniqueItems, menuMiscNumberItems, menuMiscOrderItems, menuMiscReverseItems, menuMiscListDifferentItems, menuMiscQueryCommonItems, menuMiscExplorerFolder, menuMiscCommandPrompt, menuMiscBurnToCD, menuMiscWebDownload, menuMiscWebClientUtilities;
 public ToolStripMenuItem menuWindow, menuWindowNext, menuWindowPrior, menuWindowArrangeIcons, menuWindowCascade, menuWindowTileHorizontal, menuWindowTileVertical;
@@ -962,6 +962,12 @@ menuNavigateGoToPart = CreateMenuItem("Go to Part", "Alt+Shift+G", menuItem_Clic
 menuNavigateSetBookmark = CreateMenuItem("Set Bookmar&k", "Control+K", menuItem_Click, "child speak");
 menuNavigateClearBookmark = CreateMenuItem("Clear Bookmark", "Control+Shift+K", menuItem_Click, "child speak");
 menuNavigateGoToBookmark = CreateMenuItem("Go to Bookmark", "Alt+K", menuItem_Click, "child speak");
+// Sequential bookmark navigation (Michal Kasperczak, 13.08.2026): jump
+// straight to the next / previous bookmark without opening the list, and
+// speak the whole line landed on. Shift+PageUp / Shift+PageDown were
+// unassigned (verified: no occurrence in any *.cs or EdSharp.ini).
+menuNavigateNextBookmark = CreateMenuItem("Next Bookmark", "Shift+PageDown", menuItem_Click, "child silent");
+menuNavigatePriorBookmark = CreateMenuItem("Prior Bookmark", "Shift+PageUp", menuItem_Click, "child silent");
 menuNavigateHomeCharacter = CreateMenuItem("Home Character", "Alt+Home", menuItem_Click, "child silent");
 menuNavigateEndCharacter = CreateMenuItem("End Character", "Alt+End", menuItem_Click, "child silent");
 menuNavigateStartTag = CreateMenuItem("Start Tag", "Control+Shift+Oemcomma", menuItem_Click, "child silent");
@@ -995,7 +1001,7 @@ menuNavigateGoToContents = CreateMenuItem("Go to Contents", "Shift+F6", menuItem
 menuNavigateSearchForTopic = CreateMenuItem("Search for Topic ...", "Control+F6", menuItem_Click, "child silent");
 menuNavigateSearchForTopicAgain = CreateMenuItem("Search for Topic Again", "Alt+F6", menuItem_Click, "child silent");
 menuNavigateGoToStartOfSelection = CreateMenuItem("Go to Start of Selection", "Alt+Shift+F8", menuItem_Click, "child speak");
-menuNavigate.DropDownItems.AddRange(new ToolStripItem[] {menuNavigateForwardFind, menuNavigateReverseFind, menuNavigateForwardFindWithRegExp, menuNavigateReverseFindWithRegExp,  menuNavigateForwardFindAtCursor, menuNavigateReverseFindAtCursor, menuNavigateForwardFindAgain, menuNavigateReverseFindAgain, menuNavigateJumpToLine, menuNavigateJumpToLineAgain, menuNavigateGoToPercent, menuNavigateGoToPercentAgain, menuNavigateGoToPart, menuNavigateSetBookmark, menuNavigateClearBookmark, menuNavigateGoToBookmark, menuNavigateHomeCharacter, menuNavigateEndCharacter, menuNavigateStartTag, menuNavigateEndTag,  menuNavigateNextJustify, menuNavigatePriorJustify, menuNavigateNextStyle, menuNavigatePriorStyle, menuNavigateNextBaseline, menuNavigatePriorBaseline, menuNavigateNextFont, menuNavigatePriorFont, menuNavigateRightBrace, menuNavigateNextBlock, menuNavigatePriorBlock, menuNavigateLeftBrace, menuNavigateNextIndent, menuNavigatePriorIndent, menuNavigateNextChunk,  menuNavigatePriorChunk, menuNavigateNextSentence, menuNavigatePriorSentence, menuNavigateNextParagraph, menuNavigatePriorParagraph, menuNavigateNextPart, menuNavigatePriorPart, menuNavigateNextSection, menuNavigatePriorSection, menuNavigateGoToSection, menuNavigateGoToContents, menuNavigateSearchForTopic, menuNavigateSearchForTopicAgain, menuNavigateGoToStartOfSelection});
+menuNavigate.DropDownItems.AddRange(new ToolStripItem[] {menuNavigateForwardFind, menuNavigateReverseFind, menuNavigateForwardFindWithRegExp, menuNavigateReverseFindWithRegExp,  menuNavigateForwardFindAtCursor, menuNavigateReverseFindAtCursor, menuNavigateForwardFindAgain, menuNavigateReverseFindAgain, menuNavigateJumpToLine, menuNavigateJumpToLineAgain, menuNavigateGoToPercent, menuNavigateGoToPercentAgain, menuNavigateGoToPart, menuNavigateSetBookmark, menuNavigateClearBookmark, menuNavigateGoToBookmark, menuNavigateNextBookmark, menuNavigatePriorBookmark, menuNavigateHomeCharacter, menuNavigateEndCharacter, menuNavigateStartTag, menuNavigateEndTag,  menuNavigateNextJustify, menuNavigatePriorJustify, menuNavigateNextStyle, menuNavigatePriorStyle, menuNavigateNextBaseline, menuNavigatePriorBaseline, menuNavigateNextFont, menuNavigatePriorFont, menuNavigateRightBrace, menuNavigateNextBlock, menuNavigatePriorBlock, menuNavigateLeftBrace, menuNavigateNextIndent, menuNavigatePriorIndent, menuNavigateNextChunk,  menuNavigatePriorChunk, menuNavigateNextSentence, menuNavigatePriorSentence, menuNavigateNextParagraph, menuNavigatePriorParagraph, menuNavigateNextPart, menuNavigatePriorPart, menuNavigateNextSection, menuNavigatePriorSection, menuNavigateGoToSection, menuNavigateGoToContents, menuNavigateSearchForTopic, menuNavigateSearchForTopicAgain, menuNavigateGoToStartOfSelection});
 //Dialog.Show("Navigate.", menuNavigate.DropDownItems.Count);
 
 menuQuery = CreateMenu("&Query");
@@ -3847,11 +3853,69 @@ break;
 }
 //Dialog.Show(iDefault);
 
-sResult = Dialog.Pick("Bookmarks", aValues, aDisplay, false, iDefault);
+sResult = Dialog.PickBookmark("Bookmarks", aValues, aDisplay, iDefault, sFile);
 if (sResult.Length == 0) return;
 }
 
 rtb.Index = Int32.Parse(sResult);
+Util.Say(rtb.RowText);
+}
+
+// Next / Prior Bookmark (Shift+PageDown / Shift+PageUp). Sequential
+// bookmark navigation: jump straight to the nearest bookmark in the given
+// direction WITHOUT opening the Bookmarks list, then speak the whole line
+// landed on (same feedback as Go to Bookmark). At the last / first
+// bookmark it stays put and says so, instead of wrapping around.
+if (menuItem == menuNavigateNextBookmark || menuItem == menuNavigatePriorBookmark) {
+bool bNextBookmark = (menuItem == menuNavigateNextBookmark);
+sFile = child.File;
+if (!sFile.Contains(@"\")) {
+AddMessage("No disk file is open for this command!");
+return;
+}
+
+sText = App.ReadValue("Favorites", sFile, "");
+HomerList hlMarks = new HomerList(sText);
+hlMarks.KeepLike(@"^\d+$");
+hlMarks.Remove("-1");
+if (hlMarks.Count == 0) {
+AddMessage("No bookmark!");
+return;
+}
+
+List<int> listMarks = new List<int>();
+foreach (string sMark in hlMarks) {
+int iMark;
+if (!Int32.TryParse(sMark.Trim(), out iMark)) continue;
+if (iMark < 0) continue;
+if (iMark > rtb.TextLength) iMark = rtb.TextLength;
+if (!listMarks.Contains(iMark)) listMarks.Add(iMark);
+}
+if (listMarks.Count == 0) {
+AddMessage("No bookmark!");
+return;
+}
+listMarks.Sort();
+
+iIndex = rtb.Index;
+iResult = -1;
+if (bNextBookmark) {
+for (int i = 0; i < listMarks.Count; i++) {
+if (listMarks[i] > iIndex) { iResult = listMarks[i]; break; }
+}
+}
+else {
+for (int i = listMarks.Count - 1; i >= 0; i--) {
+if (listMarks[i] < iIndex) { iResult = listMarks[i]; break; }
+}
+}
+
+if (iResult < 0) {
+AddMessage(bNextBookmark ? "Last bookmark!" : "First bookmark!");
+return;
+}
+
+rtb.Index = iResult;
 Util.Say(rtb.RowText);
 }
 
@@ -11950,6 +12014,65 @@ if (i >= 0 && i < aVal.Length) sReturn = aVal[i];
 dlg.Dispose();
 return sReturn;
 } // Pick method
+
+// PickBookmark: the Bookmarks list opened by Go to Bookmark (Alt+K),
+// specialized so a bookmark can be dropped without leaving the dialog:
+//   Delete / Backspace - remove the highlighted bookmark
+// Requested by Michal Kasperczak (13.08.2026). Removal rewrites the
+// bookmark list stored for sFile in the INI Favorites section - the same
+// store Clear Bookmark (Control+Shift+K) edits - so the change is
+// permanent as soon as the key is pressed. After a removal the highlight
+// stays at the same list position (which is now the following bookmark);
+// on the last item it moves up. Emptying the list closes the dialog.
+// aValue holds the character indexes (possibly space-padded, as Pick
+// does), aDisplay the line texts.
+public static string PickBookmark(string sTitle, string[] aValue, string[] aDisplay, int iIndex, string sFile) {
+List<string> lVal = new List<string>(aValue);
+List<string> lDisp = new List<string>((aDisplay == null) ? aValue : aDisplay);
+
+LbcDialog dlg = new LbcDialog(sTitle, App.Frame);
+ListBox lst = dlg.addListBox(lDisp, "", "Delete or Backspace removes the bookmark");
+if (iIndex >= 0 && iIndex < lDisp.Count) lst.SelectedIndex = iIndex;
+
+lst.KeyDown += delegate(object oSender, KeyEventArgs ev) {
+if (ev.KeyData != Keys.Delete && ev.KeyData != Keys.Back) return;
+ListBox lb = oSender as ListBox;
+if (lb == null) return;
+int i = lb.SelectedIndex;
+ev.Handled = true; ev.SuppressKeyPress = true;
+if (i < 0 || i >= lVal.Count) return;
+
+// Drop the bookmark from the INI store. Values may be space-padded
+// for aligned display, so match on the trimmed number.
+if (sFile.Length > 0) {
+string sStored = App.ReadValue("Favorites", sFile, "");
+HomerList hl = new HomerList(sStored);
+hl.Remove(lVal[i].Trim());
+App.WriteValue("Favorites", sFile, hl.Segments);
+}
+
+lVal.RemoveAt(i);
+lDisp.RemoveAt(i);
+lb.Items.RemoveAt(i);
+if (lb.Items.Count == 0) {
+App.Frame.AddMessage("No bookmark!");
+Form frmHost = lb.FindForm();
+if (frmHost != null) frmHost.Close();
+return;
+}
+if (i >= lb.Items.Count) i = lb.Items.Count - 1;
+lb.SelectedIndex = i;
+App.Frame.AddMessage("Bookmark removed");
+};
+
+string sReturn = "";
+if (dlg.runOkCancel()) {
+int i = lst.SelectedIndex;
+if (i >= 0 && i < lVal.Count) sReturn = lVal[i];
+}
+dlg.Dispose();
+return sReturn;
+} // PickBookmark method
 
 // PickFile: a Pick list specialized for file paths (Recent Files,
 // List Favorites). Behaves exactly like Pick(value, display, ...) for
