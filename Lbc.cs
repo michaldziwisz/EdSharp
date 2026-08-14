@@ -617,6 +617,14 @@ public class LbcDialog : IDisposable
     // Layout state. Built up by add* calls, consumed by runX.
     // Alphabetical declarations.
     private Dictionary<Control, string> dFocusTips;
+    // Long per-control key lists. The status-bar tip must stay SHORT
+    // because a screen reader speaks the status bar while announcing
+    // the freshly opened dialog -- a long tip is then read out before
+    // the focused list item, which is exactly backwards for the user
+    // who only wants to hear the file name. So a control may carry a
+    // short tip here and register its full key list as a help detail,
+    // surfaced on demand by the Help button / F1.
+    private Dictionary<Control, string> dHelpDetails;
     private Dictionary<string, int>     dNameCounts;
     private Dictionary<string, Control> dWidgets;
     private Control                     ctlFirstFocusable;
@@ -690,6 +698,7 @@ public class LbcDialog : IDisposable
         frm.Controls.Add(pnlStack);
 
         dFocusTips = new Dictionary<Control, string>();
+        dHelpDetails = new Dictionary<Control, string>();
         dNameCounts = new Dictionary<string, int>();
         dWidgets = new Dictionary<string, Control>(StringComparer.OrdinalIgnoreCase);
         iTabIndex = 0;
@@ -1394,6 +1403,18 @@ public class LbcDialog : IDisposable
                     evArgs.SuppressKeyPress = true;
                     pickFocusControl();
                 }
+                // Shift+F1 speaks the focused control's tip and, when
+                // registered, its full key list. LbcTextBox already
+                // implements Shift+F1 for itself, so only lists are
+                // handled here -- otherwise the form would swallow the
+                // text box's own tip.
+                else if (evArgs.KeyData == (Keys.Shift | Keys.F1)
+                         && (frm.ActiveControl is ListBox))
+                {
+                    evArgs.Handled = true;
+                    evArgs.SuppressKeyPress = true;
+                    sayFocusHelp(frm.ActiveControl);
+                }
             };
         }
         // Single-button confirmation dialogs (e.g., the read-only
@@ -1475,6 +1496,11 @@ public class LbcDialog : IDisposable
             if (dFocusTips.TryGetValue(ctl, out sTip) && !string.IsNullOrEmpty(sTip))
                 sbHelp.Append(" -- ").Append(sTip);
             sbHelp.AppendLine();
+            // Long key lists live here rather than on the status bar,
+            // so they never delay the dialog's opening announcement.
+            string sDetail;
+            if (dHelpDetails.TryGetValue(ctl, out sDetail) && !string.IsNullOrEmpty(sDetail))
+                sbHelp.Append("    Keys: ").AppendLine(sDetail);
         }
         sbHelp.AppendLine();
         sbHelp.AppendLine("Dialog keys:");
@@ -1601,6 +1627,37 @@ public class LbcDialog : IDisposable
     public void setStatusText(string sText)
     {
         if (lblStatusBar != null) lblStatusBar.Text = sText ?? "";
+    }
+
+    // setHelpDetail: attach a long key list to a control WITHOUT
+    // putting it on the status bar. The status bar is spoken by screen
+    // readers as part of the dialog's opening announcement, so a long
+    // tip there delays the one thing the user actually wants to hear
+    // (the focused item). Register the long text here instead: it is
+    // listed under the control in the Help dialog (Help button / F1)
+    // and spoken on demand by Shift+F1 on that control.
+    public void setHelpDetail(Control ctl, string sDetail)
+    {
+        if (ctl == null || string.IsNullOrEmpty(sDetail)) return;
+        dHelpDetails[ctl] = sDetail;
+    }
+
+    // sayFocusHelp: speak a control's short tip plus its registered
+    // long key list, on explicit request (Shift+F1). Forced speech, so
+    // it is not lost behind whatever the reader is currently saying.
+    private void sayFocusHelp(Control ctl)
+    {
+        if (ctl == null) return;
+        string sTip, sDetail;
+        StringBuilder sb = new StringBuilder();
+        if (dFocusTips.TryGetValue(ctl, out sTip) && !string.IsNullOrEmpty(sTip))
+            sb.Append(sTip);
+        if (dHelpDetails.TryGetValue(ctl, out sDetail) && !string.IsNullOrEmpty(sDetail))
+        {
+            if (sb.Length > 0) sb.Append(". ");
+            sb.Append(sDetail);
+        }
+        Say.sayForced(sb.Length == 0 ? "No tip for this field" : sb.ToString());
     }
 
     private void handleGotFocus(object sender, EventArgs evArgs)

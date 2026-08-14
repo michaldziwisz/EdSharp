@@ -12240,7 +12240,13 @@ List<string> lVal = new List<string>(aVal);
 List<string> lDisp = new List<string>(aDisp);
 
 LbcDialog dlg = new LbcDialog(sTitle, App.Frame);
-ListBox lst = dlg.addListBox(lDisp, "", "Right Arrow Open With, Left Arrow read path, Ctrl+Enter show in Explorer, Ctrl+C copy path, Delete remove, Shift+Delete delete from disk");
+// Keep the status-bar tip SHORT. A screen reader speaks the status bar
+// as part of the dialog's opening announcement, so the full key list
+// used to be read out BEFORE the focused file name -- reported as
+// "it lists what the arrows do and that makes it much longer". The full
+// list now lives in Help (F1) and on demand under Shift+F1.
+ListBox lst = dlg.addListBox(lDisp, "", "Press F1 for keys");
+dlg.setHelpDetail(lst, "Right Arrow Open With, Left Arrow read path, Ctrl+Enter show in Explorer, Ctrl+C copy path, Delete remove, Shift+Delete delete from disk");
 // Mark the list so LbcDialog's default Ctrl+C (copies the display
 // name) defers to us - we copy the full path instead.
 lst.Tag = "edsharp-filelist";
