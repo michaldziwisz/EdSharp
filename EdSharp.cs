@@ -8653,10 +8653,15 @@ if (keyData != Keys.Enter && hashKey.ContainsKey(keyData)) return false;
 				// He asked for content first, then the heading (14.08.2026 18:50:
 				// "wpierw tresc, a potem naglowek"), so read the body line that
 				// follows the heading and then the heading itself.
+				// The level is announced as "heading 3", NOT "heading level 3":
+				// Kasperczak asked for exactly that wording (14.08.2026 18:59:
+				// "Tak na zasadzie: tresc naglowek 3, tresc naglowek 6 nie
+				// tresc poziom naglowka 3"), so the word "level" is omitted.
 				string sBody = GetMarkdownHeadingBodyLine(sText, headings, iTarget);
 				string sHeading = GetMarkdownSectionHeadingTitle(headings[iTarget]);
-				if (sBody.Length > 0) Util.Say(sBody + ", " + sHeading);
-				else Util.Say(sHeading);
+				string sLevel = ", heading " + headings[iTarget].Level;
+				if (sBody.Length > 0) Util.Say(sBody + ", " + sHeading + sLevel);
+				else Util.Say(sHeading + sLevel);
 				} // GoToAdjacentMarkdownHeading method
 
 				// First non-empty line of a section's body, i.e. the text under the
