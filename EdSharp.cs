@@ -3266,9 +3266,13 @@ rtb.Index = iIndex + 1;
 Util.Say(rtb.RowText);
 }
 
+// Control+Enter starts a new section.  In this fork a section is a Markdown
+// heading, so it inserts "## " at the level of the heading above rather than
+// the original dashes-plus-form-feed break.  Kasperczak reported the old
+// behaviour as a regression (Telegram 14.08.2026 18:26) and chose the level
+// rule himself (18:34: "CTRL-Enter to naglowek taki, jak naglowek wyzej").
 if (menuItem == menuMiscSectionBreak) {
-rtb.ReplaceRange(rtb.Index, rtb.Index, SectionBreak);
-Util.Say(rtb.RowText);
+InsertMarkdownHeadingAtCursor(rtb);
 }
 
 if (menuItem == menuDeleteReplaceRegular) {
@@ -4624,40 +4628,19 @@ sMatch = App.ReadOption("NavigatePart", sMatch);
 NavigatePriorMatch(sMatch, true);
 }
 
+// A section in this fork is a Markdown heading, not the original
+// form-feed section break.  Kasperczak reported the old behaviour as a
+// regression from EdSharp 4 (Telegram 14.08.2026 18:26: "Control-PageUp-
+// PageDown to byla nawigacja po sekcjach, czyli nawigacja po naglowkach")
+// and confirmed it should walk headings of EVERY level (18:34).  This
+// reuses the same fence-aware parser as Ctrl+Alt+Up/Down section move, so
+// all three commands agree on what a section is.
 if (menuItem == menuNavigateNextSection) {
-iStart = rtb.Index;
-sText = rtb.Text;
-iEnd = rtb.TextLength;
-iIndex = sText.IndexOf(SB, iStart);
-if (iIndex == -1) {
-AddMessage("Bottom!");
-rtb.Index = iEnd;
-sLine = rtb.Lines[rtb.Lines.Length - 1];
-return;
-}
-else {
-rtb.Index = iIndex + 2;
-sText = sText.Substring(0, iIndex);
-string[] aText = sText.Split('\n');
-iLine = aText.Length;
-sLine = rtb.Lines[iLine];
-}
-Util.Say(rtb.RowText);
+GoToAdjacentMarkdownHeading(rtb, false);
 }
 
 if (menuItem == menuNavigatePriorSection) {
-iEnd = rtb.Index;
-if (iEnd > 0) iEnd--;
-sText = rtb.Text.Substring(0, iEnd);
-iIndex = sText.LastIndexOf(SB);
-if (iIndex == -1) {
-AddMessage("Top!");
-rtb.Index = 0;
-}
-else {
-rtb.Index = iIndex + 2;
-Util.Say(rtb.RowText);
-}
+GoToAdjacentMarkdownHeading(rtb, true);
 }
 
 if (menuItem == menuNavigateGoToSection) {
@@ -8592,6 +8575,86 @@ if (keyData != Keys.Enter && hashKey.ContainsKey(keyData)) return false;
 				rtb.Modified = true;
 				return true;
 				} // MoveCurrentMarkdownHeadingSection method
+
+				// Control+PageDown / Control+PageUp -- go to the next or previous
+				// Markdown heading of ANY level.  Kasperczak confirmed "every
+				// level" explicitly (Telegram 14.08.2026 18:34).  At the last or
+				// first heading the cursor stays put and only a message is
+				// announced, matching what we agreed for bookmarks (no wrapping).
+				// The whole row is spoken, again as agreed for bookmarks, because
+				// the heading text alone would not tell him where he landed.
+				private void GoToAdjacentMarkdownHeading(HomerRichTextBox rtb, bool bUp) {
+				if (rtb == null) return;
+				string sText = rtb.Text;
+				List<MarkdownSectionHeading> headings = GetMarkdownSectionHeadings(sText);
+				if (headings.Count == 0) {
+				AddMessage("No headings!");
+				return;
+				}
+
+				int iCurrent = rtb.Index;
+				int iTarget = -1;
+				if (bUp) {
+				for (int i = headings.Count - 1; i >= 0; i--) {
+				if (headings[i].Start < iCurrent) {iTarget = i; break;}
+				}
+				if (iTarget == -1) {
+				AddMessage("First heading!");
+				return;
+				}
+				}
+				else {
+				for (int i = 0; i < headings.Count; i++) {
+				if (headings[i].Start > iCurrent) {iTarget = i; break;}
+				}
+				if (iTarget == -1) {
+				AddMessage("Last heading!");
+				return;
+				}
+				}
+
+				rtb.Index = headings[iTarget].Start;
+				Util.Say(rtb.RowText);
+				} // GoToAdjacentMarkdownHeading method
+
+				// Control+Enter -- start a new section, i.e. insert a Markdown
+				// heading prefix at the level of the heading the cursor sits in.
+				// Kasperczak's rule (Telegram 14.08.2026 18:34): "naglowek taki,
+				// jak naglowek wyzej".  Before the first heading of the file there
+				// is nothing above, so it becomes a level 1 title.
+				private void InsertMarkdownHeadingAtCursor(HomerRichTextBox rtb) {
+				if (rtb == null) return;
+				string sText = rtb.Text;
+				List<MarkdownSectionHeading> headings = GetMarkdownSectionHeadings(sText);
+				int iCurrent = rtb.Index;
+
+				int iLevel = 1;
+				int iHeading = GetCurrentMarkdownSectionHeadingIndex(headings, iCurrent);
+				if (iHeading >= 0) iLevel = headings[iHeading].Level;
+				if (iLevel < 1) iLevel = 1;
+				if (iLevel > 6) iLevel = 6;
+
+				// Start the heading on a line of its own, with a blank line before
+				// it when there is text above, so the Markdown stays valid.
+				string sPrefix = "";
+				if (iCurrent > 0) {
+				bool bAtLineStart = (sText[iCurrent - 1] == '\n');
+				if (!bAtLineStart) sPrefix = LF + LF;
+				else {
+				int iPrev = iCurrent - 1;
+				if (iPrev > 0 && sText[iPrev - 1] == '\r') iPrev--;
+				bool bBlankAbove = (iPrev == 0) || (sText[iPrev - 1] == '\n');
+				if (!bBlankAbove) sPrefix = LF;
+				}
+				}
+
+				string sHashes = new String('#', iLevel);
+				string sInsert = sPrefix + sHashes + " ";
+				rtb.ReplaceRange(iCurrent, iCurrent, sInsert);
+				rtb.Index = iCurrent + sInsert.Length;
+				rtb.Modified = true;
+				AddMessage("Heading " + iLevel);
+				} // InsertMarkdownHeadingAtCursor method
 
 				private static int GetCurrentMarkdownSectionHeadingIndex(List<MarkdownSectionHeading> headings, int iCurrent) {
 				int iHeading = -1;

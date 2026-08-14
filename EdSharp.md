@@ -265,7 +265,7 @@ Several commands work with a structured text document consisting of a table of c
 
 Press Control+PageDown to go to the next section and read its heading, or Control+PageUp to go to the previous one.  When the cursor is on a topic in the table of contents, press F6 to go to its corresponding section in the body.  Press Shift+F6 to go from a section in the body to its topic in the table of contents.  Press Control+F6 to search for a topic based on text within its heading.   The search starts at the beginning of the document.  Press Alt+F6 to search again for the next match.
 
-To create a structured text document, press Control+Enter to insert a section break at the cursor position, then type the heading of the next section.  Alt+T verbally confirms the topic of the current section.  Use the Text Contents command, Alt+Shift+T, to generate and prepend a table of contents to the current document.  The first line of the document becomes the first topic in the table of contents.  Each line of text after a section break becomes another topic.
+In EdSharpNG a section is a Markdown heading, so press Control+Enter to start a new section: it inserts a heading prefix at the same level as the heading you are currently in, and you then type the heading text.  Before the first heading of a file it inserts a level 1 heading, the title.  Control+PageDown and Control+PageUp move to the next and previous heading of any level, speaking the line you land on; at the last or first heading the cursor stays where it is and EdSharp says "Last heading!" or "First heading!".  The original dashes-and-form-feed section break of EdSharp is no longer inserted by this command.  Alt+T verbally confirms the topic of the current section.  Use the Text Contents command, Alt+Shift+T, to generate and prepend a table of contents to the current document.  The first line of the document becomes the first topic in the table of contents.  Each line of text after a section break becomes another topic.
 
 You can adjust the LimitItem configuration setting to perform comparison operations on sections rather than lines of text.  For example, press Alt+Shift+C for Configuration Options, and Alt+S for the SectionBreak setting.  Since the text is initially selected, press Control+C to copy it to the clipboard.  Then press Alt+L for LimitItem, Control+V to paste, and Enter to save settings.  Now you can sort sections alphabetically with the Order Items command (Alt+Shift+O), reverse them with the Reverse Items command (Alt+Shift+Z), or eliminate duplicates with the Keep Unique Items command (Alt+Shift+U).
 
@@ -464,7 +464,7 @@ Press Alt+Shift+C to adjust configuration options of EdSharp through a dialog.  
 
 You can configure whether EdSharp's application window is maximized at startup, and whether an editing window is word wrapped when created -- the default is Yes for these options.  When a file is saved without giving it an extension, .rtf is added as a configurable default.  If a file would be overwritten, the original may be optionally saved with .bak added (default is No).  The OpenPrevious option determines whether files open at the end of the previous session are automatically opened at the start of the next one (default is No).  Another option limits the number of files shown with the Recent Files command, Alt+R (default is 100).
 
-The HardPageAddress option determines whether the Address command, Alt+A, gives a page number instead of document percentage (default is No).  A form feed character specifies a hard page break.  It is part of the sequence inserted by the Section Break command, Control+Enter, which is configurable via the SectionBreak option of the configuration dialog.  Use the Control+PageDown and Control+PageUp commands to navigate by page.  Pressing Alt+A a second time in a row gives the alternate type of address information, so you can still get a page number without changing the HardPageAddress setting.
+The HardPageAddress option determines whether the Address command, Alt+A, gives a page number instead of document percentage (default is No).  A form feed character specifies a hard page break.  In EdSharpNG the Section Break command, Control+Enter, inserts a Markdown heading instead of that sequence, and Control+PageDown and Control+PageUp navigate by heading rather than by page.  Pressing Alt+A a second time in a row gives the alternate type of address information, so you can still get a page number without changing the HardPageAddress setting.
 
 The ViewLevels option controls whether EdSharp converts a file when it is opened from outside the editor -- through Windows Explorer, the "Open with" menu, the command line, or the Recent Files command.  (The ordinary Open command, Control+O, always opens a file raw, and Open Other Format, Control+Shift+O, always converts; ViewLevels affects only the outside-the-editor paths.)  By default EdSharp opens files raw, with one exception: binary and document formats whose raw bytes are not readable -- Word (.doc, .docx), Excel (.xls, .xlsx), PowerPoint (.ppt, .pptx), PDF (.pdf), EPUB (.epub, .epub3), WordPerfect (.wpd), WinHelp (.hlp), and rich text (.rtf) -- are converted to text (or, for .rtf, shown as rich text).  Every text, markup, data, source-code, or otherwise unrecognized format opens raw, so no text format is ever auto-converted.  Braille files (.brl, .brf) are treated as text and therefore open raw, showing the braille content as it is stored rather than back-translating it.  Use ViewLevels to override any extension: a value of 0 opens that type raw and 1 converts it.  For example, "docx:0" would open Word files raw, "rst:1" would auto-convert reStructuredText, and "brl:1 brf:1" would back-translate braille on open.  The option is a single space-separated list, as in ViewLevels="docx:0 rst:1".
 
@@ -687,8 +687,8 @@ Delete Paragraph=Control+Shift+D, Delete past one or more blank lines
 Delete File=Alt+Shift+D Delete current file on disk
 Rename=Alt+Shift+R Rename current file on disk
 
-Next Section=Control+PageDown, Go to next section
-Prior Section=Control+PageUp, Go to Prior Section
+Next Section=Control+PageDown, Go to the next Markdown heading of any level
+Prior Section=Control+PageUp, Go to the previous Markdown heading of any level
 Go to Section=F6, Go to section in body from topic in table of contents
 Go to Contents=Shift+F6, Go to topic in table of contents from section in body
 Search for Topic=Control+F6, Search for a topic based on text in its heading
@@ -696,7 +696,7 @@ Search for Topic Again=Alt+F6, Search again for the next matching topic
 
 Topic=Alt+T, Say topic of current section
 Text Contents=Alt+Shift+T, Generate and prepend a table of contents to the current document
-Section Break=Control+Enter, Insert a section break at the cursor position
+Section Break=Control+Enter, Start a new section by inserting a Markdown heading at the level of the heading above
 
 HTML Format=Control+H, Convert current document to HTML in a new window
 Text Convert=Control+T, Convert other formats to text files with the same name except for a .txt extension

@@ -182,8 +182,8 @@ Delete Paragraph=Control+Shift+D, Delete past one or more blank lines
 Delete File=Alt+Shift+D, Delete current file on disk
 Rename=Alt+Shift+R, Rename current file on disk
 
-Next Section=Control+PageDown, Go to next section
-Prior Section=Control+PageUp, Go to Prior Section
+Next Section=Control+PageDown, Go to the next Markdown heading of any level
+Prior Section=Control+PageUp, Go to the previous Markdown heading of any level
 Go to Section=F6, Go to section in body from topic in table of contents
 Go to Contents=Shift+F6, Go to topic in table of contents from section in body
 Search for Topic=Control+F6, Search for a topic based on text in its heading
@@ -191,7 +191,7 @@ Search for Topic Again=Alt+F6, Search again for the next matching topic
 
 Topic=Alt+T, Say topic of current section
 Text Contents=Alt+Shift+T, Generate and prepend a table of contents to the current document
-Section Break=Control+Enter, Insert a section break at the cursor position
+Section Break=Control+Enter, Start a new section by inserting a Markdown heading at the level of the heading above
 
 HTML Format=Control+H, Convert current document to HTML in a new window
 Text Convert=Control+T, Convert other formats to text files with the same name except for a .txt extension
