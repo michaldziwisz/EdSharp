@@ -4633,11 +4633,15 @@ NavigatePriorMatch(App.MatchSentence);
 }
 
 if (menuItem == menuNavigateNextParagraph) {
-NavigateNextMatch(App.MatchParagraph);
+// Control with Up/Down is a screen reader paragraph command too, so the
+// reader speaks the destination itself -- we only move the caret.
+NavigateNextMatch(App.MatchParagraph, false, true);
 }
 
 if (menuItem == menuNavigatePriorParagraph) {
-NavigatePriorMatch(App.MatchParagraph);
+// Control with Up/Down is a screen reader paragraph command too, so the
+// reader speaks the destination itself -- we only move the caret.
+NavigatePriorMatch(App.MatchParagraph, false, true);
 }
 
 if (menuItem == menuNavigateNextPart) {
@@ -7049,8 +7053,33 @@ Util.Spell(sText);
 // the paragraph twice, either way". Cancelling the reader first and then
 // forcing our own message leaves one announcement (same pattern as the
 // section-move and window-name announcements).
+// Set for the duration of one Navigate* call when the chord is also a screen
+// reader navigation command (Control with Up/Down = paragraph).  A field keeps
+// the change additive: the existing two-argument Navigate* methods, and every
+// caller of them, stay exactly as they were.
+bool bNavigateReaderSpeaks = false;
+
 void AnnounceNavigateMessage(string sText) {
+bool bReaderSpeaks = false;
+AnnounceNavigateMessage(sText, bReaderSpeaks);
+} // AnnounceNavigateMessage method
+
+// bReaderSpeaks: the chord that triggered this move is ALSO a screen-reader
+// navigation command, so the reader speaks the destination by itself right
+// after the keystroke.  Then we must stay quiet, or the user hears the same
+// text twice -- reported for paragraph navigation (Control with Up/Down):
+// "Akapity - tak samo, pierwszy wiersz podwojnie" (17.08.2026).  Cancelling
+// the reader's speech first does NOT fix it, because the reader speaks after
+// the keystroke has been handled, not before.  The status bar is still
+// updated, so the text stays available on request.  Chords the reader does
+// NOT claim (Alt with arrows for chunk and sentence, Alt with PageUp and
+// PageDown for part) keep speaking, otherwise they would be silent.
+void AnnounceNavigateMessage(string sText, bool bReaderSpeaks) {
 if (sText == null || sText.Trim().Length == 0) return;
+if (bReaderSpeaks) {
+SetStatus(this.statusBar.Items[0].Text + "   " + sText);
+return;
+}
 try {if (Win32.IsNVDAActive()) Win32.NVDACancelSpeech();} catch {}
 AddMessage(sText, true);
 } // AnnounceNavigateMessage method
@@ -7058,6 +7087,14 @@ AddMessage(sText, true);
 public void NavigateNextMatch(string sMatch) {
 bool bLine = false;
 NavigateNextMatch(sMatch, bLine);
+} // NavigateNextMatch method
+
+// Overload taking bReaderSpeaks; see AnnounceNavigateMessage for why a
+// reader-claimed chord must not be announced by us as well.
+public void NavigateNextMatch(string sMatch, bool bLine, bool bReaderSpeaks) {
+this.bNavigateReaderSpeaks = bReaderSpeaks;
+try { NavigateNextMatch(sMatch, bLine); }
+finally { this.bNavigateReaderSpeaks = false; }
 } // NavigateNextMatch method
 
 public void NavigateNextMatch(string sMatch, bool bLine) {
@@ -7108,12 +7145,20 @@ else {
 sText = rtb.GetRange(iStart, iEnd);
 rtb.Index = iIndex;
 }
-this.AnnounceNavigateMessage(sText);
+this.AnnounceNavigateMessage(sText, this.bNavigateReaderSpeaks);
 } // NavigateNextMatch method
 
 public void NavigatePriorMatch(string sMatch) {
 bool bLine = false;
 NavigatePriorMatch(sMatch, bLine);
+} // NavigatePriorMatch method
+
+// Overload taking bReaderSpeaks; see AnnounceNavigateMessage for why a
+// reader-claimed chord must not be announced by us as well.
+public void NavigatePriorMatch(string sMatch, bool bLine, bool bReaderSpeaks) {
+this.bNavigateReaderSpeaks = bReaderSpeaks;
+try { NavigatePriorMatch(sMatch, bLine); }
+finally { this.bNavigateReaderSpeaks = false; }
 } // NavigatePriorMatch method
 
 public void NavigatePriorMatch(string sMatch, bool bLine) {
@@ -7177,7 +7222,7 @@ else {
 sText = rtb.GetRange(iStart, iEnd);
 rtb.Index = iIndex;
 }
-this.AnnounceNavigateMessage(sText);
+this.AnnounceNavigateMessage(sText, this.bNavigateReaderSpeaks);
 } // NavigatePriorMatch method
 
 public void FileFind() {
@@ -8647,16 +8692,21 @@ if (keyData != Keys.Enter && hashKey.ContainsKey(keyData)) return false;
 		return true;
 		}
 
-		// Plain move: place the caret and let the screen reader speak the
-		// word landed on, exactly as it does for its own word navigation.
+		// Plain move: place the caret and SAY NOTHING.  A screen reader binds
+		// Control with Left/Right to its own "move by word" command: it passes the
+		// keystroke to us and then speaks the word the caret landed on, by its own
+		// Unicode word rules.  Speaking here as well made every word sound twice --
+		// Kasperczak reported it verbatim (Telegram 17.08.2026): "Nawigacja slowa -
+		// czyta dwa razy kazde slowo".  Cancelling the reader first does not help,
+		// because the reader speaks AFTER the keystroke is processed.  Our job is
+		// only to put the caret on the right character, which is what the Polish
+		// letters fix was about; the announcement belongs to the reader.  Evidence
+		// that the reader does announce on this machine: plain arrows already read
+		// the line exactly once ("Gora dol normalnie czytaja po wierszu").
 		rtb.DeselectAll();
 		rtb.SelectionStart = iTarget;
 		rtb.SelectionLength = 0;
 		rtb.ScrollToCaret();
-		int iWordEnd = iTarget;
-		while (iWordEnd < sText.Length && IsWordChar(sText[iWordEnd])) iWordEnd++;
-		if (iWordEnd > iTarget) Util.Say(sText.Substring(iTarget, iWordEnd - iTarget));
-		else if (iTarget < sText.Length) Util.Say(sText.Substring(iTarget, 1));
 		return true;
 		} // HandleWordNavigationKey method
 
@@ -14224,7 +14274,7 @@ sFile = RedirectFile(sFile, sSection);
 string[] aDefault = new string[] {};
 if (!File.Exists(sFile)) return aDefault;
 
-string sText = Util.File2String(sFile);
+string sText = Util.IniFile2String(sFile);
 string sMatch = "^\\[" + sSection + "\\](.|\n)*?((\n\\[)|\\Z)";
 object[] aResult = Util.RegExpContainsCase(sText, sMatch);
 int iIndex = (int) aResult[0];
@@ -14252,7 +14302,7 @@ public static string[] ReadSections(string sFile) {
 string[] aDefault = new string[] {};
 if (!File.Exists(sFile)) return aDefault;
 
-string sText = Util.File2String(sFile);
+string sText = Util.IniFile2String(sFile);
 string sMatch = "^\\[.+?\\]\r\n";
 string[] aResults = Util.RegExpExtractCase(sText, sMatch);
 string sSections = String.Join("", aResults).Trim();
@@ -15362,6 +15412,32 @@ if (iCount == 1) sReturn += sSingular;
 else sReturn += sPlural;
 return sReturn;
 } // Pluralize method
+
+// Read an .ini file for KEY ENUMERATION.  Windows writes .ini files through
+// WritePrivateProfileString in the system ANSI code page, so on a Polish
+// system a file name containing "\u0142" is stored as the single byte 0xB3.
+// File2String assumes UTF-8 when there is no byte-order mark, which turned
+// that byte into U+FFFD; the recovered key then matched no file on disk and
+// the Recent/Favorites cleanup loops DELETED the entry.  Kasperczak reported
+// it verbatim (Telegram 17.08.2026): a favorite whose name starts with a
+// Polish letter disappeared from both lists after closing, and renaming the
+// file to plain ASCII made it stay.  Measured with an EM/WritePrivateProfile
+// harness: byte 0xB3 written, UTF-8 read gives U+FFFD, an ANSI read restores
+// the original path.  So: a byte-order mark still wins, then STRICT UTF-8
+// (a real UTF-8 file decodes), and only a file that is not valid UTF-8 falls
+// back to the ANSI code page.
+public static string IniFile2String(string sFile) {
+if (!File.Exists(sFile)) return "";
+byte[] aBytes = System.IO.File.ReadAllBytes(sFile);
+if (aBytes.Length >= 3 && aBytes[0] == 0xEF && aBytes[1] == 0xBB && aBytes[2] == 0xBF) return new UTF8Encoding(true).GetString(aBytes, 3, aBytes.Length - 3);
+if (aBytes.Length >= 2 && aBytes[0] == 0xFF && aBytes[1] == 0xFE) return Encoding.Unicode.GetString(aBytes, 2, aBytes.Length - 2);
+if (aBytes.Length >= 2 && aBytes[0] == 0xFE && aBytes[1] == 0xFF) return Encoding.BigEndianUnicode.GetString(aBytes, 2, aBytes.Length - 2);
+try {
+UTF8Encoding enStrict = new UTF8Encoding(false, true);
+return enStrict.GetString(aBytes);
+}
+catch (DecoderFallbackException) { return Encoding.Default.GetString(aBytes); }
+} // IniFile2String method
 
 public static string File2String(string sFile) {
 Encoding en = null;

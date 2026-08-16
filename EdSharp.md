@@ -670,14 +670,14 @@ Trim Blanks=Control+Shift+Enter, Trim leading and trailing blanks from the curre
 
 End Character=Alt+End, Go to last non-blank character of line and read it
 Home Character=Alt+Home, Go to first non-blank character of line and read it
-Next Word=Control+RightArrow, Go to next word and read it
-Prior Word=Control+LeftArrow, Go to previous word and read it
+Next Word=Control+RightArrow, Go to next word (word boundaries follow Unicode letters, so accented and Polish letters do not split a word); your screen reader reads the word it lands on
+Prior Word=Control+LeftArrow, Go to previous word (word boundaries follow Unicode letters, so accented and Polish letters do not split a word); your screen reader reads the word it lands on
 Next Chunk=Alt+RightArrow, Go to next chunk and read it
 Prior Chunk=Alt+LeftArrow, Go to previous chunk and read it
 Next Sentence=Alt+DownArrow, Go to next sentence and read it
 Prior Sentence=Alt+UpArrow, Go to previous sentence and read it
-Next Paragraph=Control+DownArrow, Go to next paragraph and read it
-Prior Paragraph=Control+UpArrow, Go to previous paragraph and read it
+Next Paragraph=Control+DownArrow, Go to next paragraph; your screen reader reads the destination, and the paragraph text is also placed on the status bar
+Prior Paragraph=Control+UpArrow, Go to previous paragraph; your screen reader reads the destination, and the paragraph text is also placed on the status bar
 
 Delete Right=Control+Shift+Delete, Delete from cursor to end of line
 Delete Left=Control+Shift+Backspace, Delete from cursor to start of line
