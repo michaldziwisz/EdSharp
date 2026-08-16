@@ -620,7 +620,7 @@ hl.Remove("-1");
 DateTime dt = DateTime.Now;
 string sTime = dt.ToString("u");
 sTime = sTime.Substring(0, sTime.Length - 1);
-sText = sTime + "|" + iIndex + "|" + (rtb.ReadOnly ? "G" : "M") + "|" + (string) Util.If(rtb.WordWrap, "W", "U");
+sText = sTime + "|" + iIndex + "|" + (App.Frame.GetUserGuard(this) ? "G" : "M") + "|" + (string) Util.If(rtb.WordWrap, "W", "U");
 // hl.AddUniqueRange(sText);
 // sText = hl.Segments;
 App.WriteValue("Recent", sFile, sText);
@@ -1260,6 +1260,7 @@ this.KeyIndex = iIndex;
 if (HandleFileSlotKey(keyData)) return true;
 if (HandleWindowNumberKey(keyData)) return true;
 if (HandleCloseWindowKey(keyData)) return true;
+if (HandleWordNavigationKey(keyData)) return true;
 if (HandleSectionMoveKey(keyData)) return true;
 // Markdown review (preview) mode: Escape toggles it on .md files; while
 // active, navigation/elements-list keys are handled here, and arrow keys
@@ -3130,12 +3131,12 @@ rtb.Text = sText;
 
 if (menuItem == menuMiscGuardDocument) {
 rtb.SetGuard(true);
-SetRecent(child.File);
+SaveGuardFlag(child.File, true);
 }
 
 if (menuItem == menuMiscNoGuard) {
 rtb.SetGuard(false);
-SetRecent(child.File);
+SaveGuardFlag(child.File, false);
 }
 
 if (menuItem == menuMiscPyBrace) {
@@ -3844,7 +3845,7 @@ sText = App.ReadValue("Favorites", sFile, "");
 HomerList hl = new HomerList(sText);
 hl.KeepLike(@"\d+");
 hl.Remove("-1");
-sText = rtb.Index + "|" + (rtb.ReadOnly ? "G" : "M") + "|" + (string) Util.If(rtb.WordWrap, "W", "U");
+sText = rtb.Index + "|" + (GetUserGuard(child) ? "G" : "M") + "|" + (string) Util.If(rtb.WordWrap, "W", "U");
 hl.AddUniqueRange(sText);
 sText = hl.Segments;
 App.WriteValue("Favorites", sFile, sText);
@@ -3985,7 +3986,7 @@ sText = App.ReadValue("Favorites", sFile, "");
 HomerList hl = new HomerList(sText);
 hl.KeepLike(@"\d+");
 if (hl.Count == 0) hl.Add("-1");
-sText = (rtb.ReadOnly ? "G" : "M") + "|" + (string) Util.If(rtb.WordWrap, "W", "U");
+sText = (GetUserGuard(child) ? "G" : "M") + "|" + (string) Util.If(rtb.WordWrap, "W", "U");
 hl.AddUniqueRange(sText);
 sText = hl.Segments;
 App.WriteValue("Favorites", sFile, sText);
@@ -6727,6 +6728,28 @@ child.Close();
 return true;
 } // CloseWindow method
 
+// Persist the guard flag for a file in BOTH stores that remember it.
+//
+// Guard Document / No Guard used to call SetRecent only, which rewrites
+// the Recent entry. But ApplyGuard consults Favorites FIRST, so for a
+// favourite file the stale "G" survived and the document opened guarded
+// again on the next visit -- the user cleared it with Control+Shift+F7
+// over and over and it kept coming back. Update the favourite entry too.
+public void SaveGuardFlag(string sFile, bool bGuard) {
+if (sFile == null || !sFile.Contains(@"\")) return;
+string sStored = App.ReadValue("Favorites", sFile, "");
+if (sStored.Length > 0) {
+HomerList hlFav = new HomerList(sStored);
+for (int i = 0; i < hlFav.Count; i++) {
+string sSeg = hlFav[i];
+if (sSeg == "G" || sSeg == "M") hlFav[i] = bGuard ? "G" : "M";
+}
+if (!hlFav.Contains("G") && !hlFav.Contains("M")) hlFav.Add(bGuard ? "G" : "M");
+App.WriteValue("Favorites", sFile, hlFav.Segments);
+}
+SetRecent(sFile);
+} // SaveGuardFlag method
+
 public void SetRecent(string sFile) {
 if (!sFile.Contains(@"\")) return;
 if (Util.Equiv(sFile, App.IniFile)) return;
@@ -6737,7 +6760,7 @@ sTime = sTime.Substring(0, sTime.Length - 1);
 int iIndex = this.Child.RTB.Index;
 sTime += "|" + iIndex;
 if (this.MdiChildren.Length == 0) sTime += "|N|W";
-else sTime += "|" + (this.Child.RTB.ReadOnly ? "G" : "M") + "|" + Util.If(this.Child.RTB.WordWrap, "W", "U");
+else sTime += "|" + (GetUserGuard(this.Child) ? "G" : "M") + "|" + Util.If(this.Child.RTB.WordWrap, "W", "U");
 App.WriteValue("Recent", sFile, sTime);
 string sDir = Path.GetDirectoryName(sFile);
 if (Directory.Exists(sDir)) Directory.SetCurrentDirectory(sDir);
@@ -6764,6 +6787,24 @@ rtb.SetWrap(false);
 }
 return true;
 } // ApplyWrap method
+
+// The document's REAL guard (read-only) state, as the user set it.
+//
+// The Markdown preview turns the guard ON for as long as the preview is
+// open (MarkdownReview_Enter) and restores the previous value on exit.
+// Anything that PERSISTS the guard flag must therefore not read
+// rtb.ReadOnly directly: bookmarking or favouriting a file while the
+// preview was open stored "G", and the file then opened read-only for
+// ever after, with no way to tell why. Reported as "files open guarded
+// and I never guarded them", and it only showed on favourites because
+// that is where the flag gets written. Ask this helper instead.
+public bool GetUserGuard(MdiChild child) {
+if (child == null) return false;
+HomerRichTextBox rtbGuard = child.RTB;
+if (rtbGuard == null) return false;
+if (child.MarkdownReviewMode) return child.MarkdownReviewOldGuard;
+return rtbGuard.ReadOnly;
+} // GetUserGuard method
 
 bool ApplyGuard(string sSection, string sFile) {
 string sText = App.ReadValue(sSection, sFile, "");
@@ -6997,6 +7038,23 @@ Util.Spell(sText);
 }
 } // WindowsOpen method
 
+// Announce arrival for the Navigate* family (chunk, sentence, paragraph,
+// part) with EXACTLY ONE spoken result.
+//
+// The reader announces the line by itself when the caret moves after a
+// navigation keystroke, while these commands ALSO spoke the range they
+// moved over. Both start with the same first line, so the user heard the
+// first line of the paragraph twice, in both directions -- reported
+// verbatim as "when I navigate by paragraph it reads the first line of
+// the paragraph twice, either way". Cancelling the reader first and then
+// forcing our own message leaves one announcement (same pattern as the
+// section-move and window-name announcements).
+void AnnounceNavigateMessage(string sText) {
+if (sText == null || sText.Trim().Length == 0) return;
+try {if (Win32.IsNVDAActive()) Win32.NVDACancelSpeech();} catch {}
+AddMessage(sText, true);
+} // AnnounceNavigateMessage method
+
 public void NavigateNextMatch(string sMatch) {
 bool bLine = false;
 NavigateNextMatch(sMatch, bLine);
@@ -7050,7 +7108,7 @@ else {
 sText = rtb.GetRange(iStart, iEnd);
 rtb.Index = iIndex;
 }
-this.AddMessage(sText);
+this.AnnounceNavigateMessage(sText);
 } // NavigateNextMatch method
 
 public void NavigatePriorMatch(string sMatch) {
@@ -7119,7 +7177,7 @@ else {
 sText = rtb.GetRange(iStart, iEnd);
 rtb.Index = iIndex;
 }
-this.AddMessage(sText);
+this.AnnounceNavigateMessage(sText);
 } // NavigatePriorMatch method
 
 public void FileFind() {
@@ -8488,6 +8546,120 @@ if (keyData != Keys.Enter && hashKey.ContainsKey(keyData)) return false;
 		// Control+W = Close Window, an additional chord alongside Control+F4.
 		// In stock EdSharp Control+W was Word Wrap; that command was moved to
 		// Control+F12 on Kasperczak's explicit authorization.
+		// Word navigation that understands Polish (and any other accented)
+		// letters. Control+Right / Control+Left.
+		//
+		// MEASURED PROBLEM: the RichEdit control breaks a word at every
+		// non-ASCII letter. Asking the control itself with EM_FINDWORDBREAK /
+		// WB_MOVEWORDRIGHT over "wszystkich swietych" (with Polish diacritics)
+		// returned the chunks [wszystkich ][s][wietych ] -- so a screen reader
+		// read the accented letter as a word of its own. Reported as "it says
+		// wszystkich, then just s, then wietych".
+		//
+		// We therefore compute the boundary ourselves with Char.IsLetterOrDigit,
+		// which is Unicode-aware, and move the caret there. Selection with Shift
+		// held is preserved by extending the existing selection anchor, so
+		// Control+Shift+Right still selects whole words.
+		private static bool IsWordChar(char c) {
+		return Char.IsLetterOrDigit(c) || c == '_';
+		} // IsWordChar method
+
+		// Where Control+Right should land: skip the rest of the current word,
+		// then the run of separators, stopping at the start of the next word.
+		// Mirrors how editors and screen readers agree on "next word".
+		public static int NextWordIndex(string sText, int iFrom) {
+		if (sText == null) return 0;
+		int iLen = sText.Length;
+		if (iFrom >= iLen) return iLen;
+		int i = iFrom;
+		if (i < 0) i = 0;
+		// A newline is a boundary of its own, so navigation does not jump
+		// across a blank line in one keystroke.
+		if (sText[i] == '\n' || sText[i] == '\r') {
+		while (i < iLen && (sText[i] == '\r' || sText[i] == '\n')) i++;
+		return i;
+		}
+		if (IsWordChar(sText[i])) {
+		while (i < iLen && IsWordChar(sText[i])) i++;
+		}
+		else {
+		while (i < iLen && !IsWordChar(sText[i])
+		&& sText[i] != '\r' && sText[i] != '\n') i++;
+		return i;
+		}
+		while (i < iLen && !IsWordChar(sText[i]) && sText[i] != '\r' && sText[i] != '\n') i++;
+		return i;
+		} // NextWordIndex method
+
+		// Where Control+Left should land: the start of the word the caret is
+		// in, or of the previous word when already at a word start.
+		public static int PriorWordIndex(string sText, int iFrom) {
+		if (sText == null) return 0;
+		int i = iFrom;
+		if (i > sText.Length) i = sText.Length;
+		if (i <= 0) return 0;
+		i--;
+		if (sText[i] == '\n' || sText[i] == '\r') {
+		while (i > 0 && (sText[i] == '\r' || sText[i] == '\n')) i--;
+		if (sText[i] == '\r' || sText[i] == '\n') return i;
+		i++;
+		return i;
+		}
+		while (i > 0 && !IsWordChar(sText[i]) && sText[i] != '\r' && sText[i] != '\n') i--;
+		if (!IsWordChar(sText[i])) return i;
+		while (i > 0 && IsWordChar(sText[i - 1])) i--;
+		return i;
+		} // PriorWordIndex method
+
+		private bool HandleWordNavigationKey(Keys keyData) {
+		bool bRight = (keyData == (Keys.Control | Keys.Right)
+		|| keyData == (Keys.Control | Keys.Shift | Keys.Right));
+		bool bLeft = (keyData == (Keys.Control | Keys.Left)
+		|| keyData == (Keys.Control | Keys.Shift | Keys.Left));
+		if (!bRight && !bLeft) return false;
+		if (hashKey.ContainsKey(keyData)) return false;
+
+		MdiChild child = this.Child;
+		if (child == null) return false;
+		// The preview is a separate control with its own navigation.
+		if (child.MarkdownReviewMode) return false;
+		HomerRichTextBox rtb = child.RTB;
+		if (rtb == null || !rtb.Focused) return false;
+
+		if (this.KeyDescriber) {
+		AddMessage(bRight ? "Next Word" : "Prior Word");
+		return true;
+		}
+
+		string sText = rtb.Text;
+		bool bExtend = ((keyData & Keys.Shift) != 0);
+		int iCaret = bExtend ? (rtb.SelectionStart + rtb.SelectionLength) : rtb.Index;
+		int iTarget = bRight ? NextWordIndex(sText, iCaret) : PriorWordIndex(sText, iCaret);
+		if (iTarget == iCaret) return true;
+
+		if (bExtend) {
+		int iAnchor = rtb.SelectionStart;
+		if (rtb.SelectionLength > 0 && iCaret == rtb.SelectionStart) iAnchor = rtb.SelectionStart + rtb.SelectionLength;
+		int iFrom = Math.Min(iAnchor, iTarget);
+		int iTo = Math.Max(iAnchor, iTarget);
+		rtb.Select(iFrom, iTo - iFrom);
+		rtb.ScrollToCaret();
+		return true;
+		}
+
+		// Plain move: place the caret and let the screen reader speak the
+		// word landed on, exactly as it does for its own word navigation.
+		rtb.DeselectAll();
+		rtb.SelectionStart = iTarget;
+		rtb.SelectionLength = 0;
+		rtb.ScrollToCaret();
+		int iWordEnd = iTarget;
+		while (iWordEnd < sText.Length && IsWordChar(sText[iWordEnd])) iWordEnd++;
+		if (iWordEnd > iTarget) Util.Say(sText.Substring(iTarget, iWordEnd - iTarget));
+		else if (iTarget < sText.Length) Util.Say(sText.Substring(iTarget, 1));
+		return true;
+		} // HandleWordNavigationKey method
+
 		private bool HandleCloseWindowKey(Keys keyData) {
 		if (keyData != (Keys.Control | Keys.W)) return false;
 		if (hashKey.ContainsKey(keyData)) return false;
@@ -12482,13 +12654,14 @@ List<string> lVal = new List<string>(aVal);
 List<string> lDisp = new List<string>(aDisp);
 
 LbcDialog dlg = new LbcDialog(sTitle, App.Frame);
-// Keep the status-bar tip SHORT. A screen reader speaks the status bar
-// as part of the dialog's opening announcement, so the full key list
-// used to be read out BEFORE the focused file name -- reported as
-// "it lists what the arrows do and that makes it much longer". The full
-// list now lives in Help (F1) and on demand under Shift+F1.
-ListBox lst = dlg.addListBox(lDisp, "", "Press F1 for keys");
-dlg.setHelpDetail(lst, "Right Arrow Open With, Left Arrow read path, Ctrl+Enter show in Explorer, Ctrl+C copy path, Delete remove, Shift+Delete delete from disk");
+// NO status-bar tip and NO spoken key hint on this list. A screen
+// reader speaks the status bar as part of the dialog's opening
+// announcement, so anything placed there delays the file name the user
+// actually opened the list for. An earlier full key list was cut down to
+// "Press F1 for keys", and that shorter hint was dropped as well on
+// request -- the list announces the file name and nothing else. The keys
+// stay documented in the manual (EdSharp.md).
+ListBox lst = dlg.addListBox(lDisp, "", "");
 // Mark the list so LbcDialog's default Ctrl+C (copies the display
 // name) defers to us - we copy the full path instead.
 lst.Tag = "edsharp-filelist";
