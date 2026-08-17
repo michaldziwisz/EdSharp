@@ -7063,20 +7063,56 @@ bool bReaderSpeaks = false;
 AnnounceNavigateMessage(sText, bReaderSpeaks);
 } // AnnounceNavigateMessage method
 
+// Returns the part of sText that follows sRow, or an empty string when sRow
+// already covers all of it.  Used to say only what the screen reader did NOT
+// read, so the user hears the whole paragraph without hearing its first row
+// twice.  Defensive: when sRow is not the start of sText (caret and reader out
+// of step) the whole text is returned rather than a confusing fragment.
+static string GetTextAfterRow(string sText, string sRow) {
+if (sText == null) return "";
+if (sRow == null) sRow = "";
+string sAll = sText.Replace(HomerRichTextBox.CR, "");
+string sFirst = sRow.Replace(HomerRichTextBox.CR, "").Trim();
+if (sFirst.Length == 0) return sAll.Trim();
+string sFlat = sAll.TrimStart();
+if (sFlat.StartsWith(sFirst, StringComparison.Ordinal)) return sFlat.Substring(sFirst.Length).Trim();
+return sAll.Trim();
+} // GetTextAfterRow method
+
 // bReaderSpeaks: the chord that triggered this move is ALSO a screen-reader
 // navigation command, so the reader speaks the destination by itself right
-// after the keystroke.  Then we must stay quiet, or the user hears the same
-// text twice -- reported for paragraph navigation (Control with Up/Down):
+// after the keystroke.  We must not repeat what it read, or the user hears the
+// same text twice -- reported for paragraph navigation (Control with Up/Down):
 // "Akapity - tak samo, pierwszy wiersz podwojnie" (17.08.2026).  Cancelling
 // the reader's speech first does NOT fix it, because the reader speaks after
-// the keystroke has been handled, not before.  The status bar is still
-// updated, so the text stays available on request.  Chords the reader does
-// NOT claim (Alt with arrows for chunk and sentence, Alt with PageUp and
-// PageDown for part) keep speaking, otherwise they would be silent.
+// the keystroke has been handled, not before.  But staying completely silent is
+// not right either: the reader reads only the ROW at the caret, so on a
+// multi-row paragraph the user heard the first line and nothing else -- his
+// follow-up report the same day.  So we say the REMAINDER only.  Chords the
+// reader does NOT claim (Alt with arrows for chunk and sentence, Alt with
+// PageUp and PageDown for part) keep speaking in full, otherwise they would be
+// silent.
 void AnnounceNavigateMessage(string sText, bool bReaderSpeaks) {
 if (sText == null || sText.Trim().Length == 0) return;
 if (bReaderSpeaks) {
 SetStatus(this.statusBar.Items[0].Text + "   " + sText);
+// The reader announces the ROW at the caret, which is NOT the whole
+// paragraph -- reported by Kasperczak (17.08.2026): "kontrol strzalka w
+// gore, w dol, kiedy sa akapity.  On czyta pierwszy wiersz tego akapitu
+// tylko, a nie czyta juz dalej".  MEASURED on a live RICHEDIT50W control:
+// a paragraph of three hard lines makes the reader say only "Punkt
+// pierwszy o zbiorce.", and with word wrap ON a single long paragraph is
+// several VISUAL rows, so again only the first is read.  With word wrap
+// OFF a one-line paragraph is read whole, and then the remainder below is
+// empty and nothing extra is said -- no repetition either way.
+// Deferred with BeginInvoke so our words are queued after the keystroke
+// has been handled, because the reader speaks after that point too.
+string sRest = GetTextAfterRow(sText, this.Child.RTB.RowText);
+if (sRest.Length > 0) {
+this.BeginInvoke((MethodInvoker) delegate {
+try {Util.Say(sRest, true);} catch {}
+});
+}
 return;
 }
 try {if (Win32.IsNVDAActive()) Win32.NVDACancelSpeech();} catch {}
