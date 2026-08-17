@@ -1260,7 +1260,6 @@ this.KeyIndex = iIndex;
 if (HandleFileSlotKey(keyData)) return true;
 if (HandleWindowNumberKey(keyData)) return true;
 if (HandleCloseWindowKey(keyData)) return true;
-if (HandleWordNavigationKey(keyData)) return true;
 if (HandleSectionMoveKey(keyData)) return true;
 // Markdown review (preview) mode: Escape toggles it on .md files; while
 // active, navigation/elements-list keys are handled here, and arrow keys
@@ -8591,125 +8590,25 @@ if (keyData != Keys.Enter && hashKey.ContainsKey(keyData)) return false;
 		// Control+W = Close Window, an additional chord alongside Control+F4.
 		// In stock EdSharp Control+W was Word Wrap; that command was moved to
 		// Control+F12 on Kasperczak's explicit authorization.
-		// Word navigation that understands Polish (and any other accented)
-		// letters. Control+Right / Control+Left.
-		//
-		// MEASURED PROBLEM: the RichEdit control breaks a word at every
-		// non-ASCII letter. Asking the control itself with EM_FINDWORDBREAK /
-		// WB_MOVEWORDRIGHT over "wszystkich swietych" (with Polish diacritics)
-		// returned the chunks [wszystkich ][s][wietych ] -- so a screen reader
-		// read the accented letter as a word of its own. Reported as "it says
-		// wszystkich, then just s, then wietych".
-		//
-		// We therefore compute the boundary ourselves with Char.IsLetterOrDigit,
-		// which is Unicode-aware, and move the caret there. Selection with Shift
-		// held is preserved by extending the existing selection anchor, so
-		// Control+Shift+Right still selects whole words.
-		private static bool IsWordChar(char c) {
-		return Char.IsLetterOrDigit(c) || c == '_';
-		} // IsWordChar method
-
-		// Where Control+Right should land: skip the rest of the current word,
-		// then the run of separators, stopping at the start of the next word.
-		// Mirrors how editors and screen readers agree on "next word".
-		public static int NextWordIndex(string sText, int iFrom) {
-		if (sText == null) return 0;
-		int iLen = sText.Length;
-		if (iFrom >= iLen) return iLen;
-		int i = iFrom;
-		if (i < 0) i = 0;
-		// A newline is a boundary of its own, so navigation does not jump
-		// across a blank line in one keystroke.
-		if (sText[i] == '\n' || sText[i] == '\r') {
-		while (i < iLen && (sText[i] == '\r' || sText[i] == '\n')) i++;
-		return i;
-		}
-		if (IsWordChar(sText[i])) {
-		while (i < iLen && IsWordChar(sText[i])) i++;
-		}
-		else {
-		while (i < iLen && !IsWordChar(sText[i])
-		&& sText[i] != '\r' && sText[i] != '\n') i++;
-		return i;
-		}
-		while (i < iLen && !IsWordChar(sText[i]) && sText[i] != '\r' && sText[i] != '\n') i++;
-		return i;
-		} // NextWordIndex method
-
-		// Where Control+Left should land: the start of the word the caret is
-		// in, or of the previous word when already at a word start.
-		public static int PriorWordIndex(string sText, int iFrom) {
-		if (sText == null) return 0;
-		int i = iFrom;
-		if (i > sText.Length) i = sText.Length;
-		if (i <= 0) return 0;
-		i--;
-		if (sText[i] == '\n' || sText[i] == '\r') {
-		while (i > 0 && (sText[i] == '\r' || sText[i] == '\n')) i--;
-		if (sText[i] == '\r' || sText[i] == '\n') return i;
-		i++;
-		return i;
-		}
-		while (i > 0 && !IsWordChar(sText[i]) && sText[i] != '\r' && sText[i] != '\n') i--;
-		if (!IsWordChar(sText[i])) return i;
-		while (i > 0 && IsWordChar(sText[i - 1])) i--;
-		return i;
-		} // PriorWordIndex method
-
-		private bool HandleWordNavigationKey(Keys keyData) {
-		bool bRight = (keyData == (Keys.Control | Keys.Right)
-		|| keyData == (Keys.Control | Keys.Shift | Keys.Right));
-		bool bLeft = (keyData == (Keys.Control | Keys.Left)
-		|| keyData == (Keys.Control | Keys.Shift | Keys.Left));
-		if (!bRight && !bLeft) return false;
-		if (hashKey.ContainsKey(keyData)) return false;
-
-		MdiChild child = this.Child;
-		if (child == null) return false;
-		// The preview is a separate control with its own navigation.
-		if (child.MarkdownReviewMode) return false;
-		HomerRichTextBox rtb = child.RTB;
-		if (rtb == null || !rtb.Focused) return false;
-
-		if (this.KeyDescriber) {
-		AddMessage(bRight ? "Next Word" : "Prior Word");
-		return true;
-		}
-
-		string sText = rtb.Text;
-		bool bExtend = ((keyData & Keys.Shift) != 0);
-		int iCaret = bExtend ? (rtb.SelectionStart + rtb.SelectionLength) : rtb.Index;
-		int iTarget = bRight ? NextWordIndex(sText, iCaret) : PriorWordIndex(sText, iCaret);
-		if (iTarget == iCaret) return true;
-
-		if (bExtend) {
-		int iAnchor = rtb.SelectionStart;
-		if (rtb.SelectionLength > 0 && iCaret == rtb.SelectionStart) iAnchor = rtb.SelectionStart + rtb.SelectionLength;
-		int iFrom = Math.Min(iAnchor, iTarget);
-		int iTo = Math.Max(iAnchor, iTarget);
-		rtb.Select(iFrom, iTo - iFrom);
-		rtb.ScrollToCaret();
-		return true;
-		}
-
-		// Plain move: place the caret and SAY NOTHING.  A screen reader binds
-		// Control with Left/Right to its own "move by word" command: it passes the
-		// keystroke to us and then speaks the word the caret landed on, by its own
-		// Unicode word rules.  Speaking here as well made every word sound twice --
-		// Kasperczak reported it verbatim (Telegram 17.08.2026): "Nawigacja slowa -
-		// czyta dwa razy kazde slowo".  Cancelling the reader first does not help,
-		// because the reader speaks AFTER the keystroke is processed.  Our job is
-		// only to put the caret on the right character, which is what the Polish
-		// letters fix was about; the announcement belongs to the reader.  Evidence
-		// that the reader does announce on this machine: plain arrows already read
-		// the line exactly once ("Gora dol normalnie czytaja po wierszu").
-		rtb.DeselectAll();
-		rtb.SelectionStart = iTarget;
-		rtb.SelectionLength = 0;
-		rtb.ScrollToCaret();
-		return true;
-		} // HandleWordNavigationKey method
-
+		// Control+Right / Control+Left are deliberately NOT handled here.
+		// We used to move the caret ourselves, because the OLD RichEdit window
+		// class (riched20) broke a word at every accented letter.  The real fault
+		// was the window class, and it is now fixed at the source: the editing
+		// control asks Windows for RICHEDIT50W (see HomerRichTextBox.CreateParams),
+		// which applies Unicode word rules and reports Polish words correctly.
+		// Handling the chord here as well made things WORSE, twice over, and both
+		// regressions were reported by Kasperczak:
+		//  - our own Util.Say added a SECOND voice, because the screen reader binds
+		//    Control with an arrow to its own "move by word" command and announces
+		//    the destination itself ("czyta dwa razy kazde slowo", 17.08.2026);
+		//  - staying silent was not enough either.  Our caret and the control
+		//    disagreed about where a word starts around punctuation -- MEASURED,
+		//    5 of 16 sequences differed, e.g. "slowo, przecinek": ours stopped at
+		//    7 18, the control at 5 7 16 18.  The reader speaks the word IT thinks
+		//    the caret is in, so a caret parked at our boundary made it read from
+		//    the previous word ("Doklada slowo, jesli jest polska literka").
+		// Letting the control move its own caret keeps caret and announcement in
+		// agreement, which is the only state where a blind user hears one word.
 		private bool HandleCloseWindowKey(Keys keyData) {
 		if (keyData != (Keys.Control | Keys.W)) return false;
 		if (hashKey.ContainsKey(keyData)) return false;
@@ -11747,6 +11646,40 @@ return base.ProcessCmdKey(ref msg, keyData);
 
 public class HomerRichTextBox : RichTextBox {
 public int OldIndex = -1;
+// Use the MODERN RichEdit window class (RICHEDIT50W from msftedit.dll) instead
+// of the riched20 class WinForms creates by default.  This is a screen reader
+// fix, not cosmetics: the old class gets Polish word boundaries WRONG, and a
+// screen reader asks the control itself where a word starts and ends.
+// MEASURED 17.08.2026 on "Parafia Wszystkich Swietych oraz zarowka":
+//   riched20        word walk = [Parafia ][Wszystkich S][wietych ][oraz z][arowka ]
+//                   word at the accented letter = "Wszystkich Swietych"
+//   RICHEDIT50W     word walk = [Parafia ][Wszystkich ][Swietych ][oraz ][zarowka ]
+//                   word at the accented letter = "Swietych"
+// So the old class both SPLITS a Polish word and REPORTS the previous word glued
+// to the current one -- exactly what Kasperczak heard (Telegram 17.08.2026):
+// "Parafia Wszystkich S Wszystkich Swietych" and "Doklada slowo, jesli jest
+// polska literka", while plain ASCII words were "poprawnie".
+// The knobs did NOT help (all measured, all still wrong on riched20):
+// EM_SETLANGOPTIONS 0 / IMF_UIFONTS (so AutoFont/DualFont is not the cause), an
+// explicit Unicode-covering font, and EM_SETWORDBREAKPROC -- which riched20
+// silently ignores: the callback was invoked ZERO times.  Changing the window
+// class is therefore the only fix that reaches the component doing it wrong.
+// Compatibility checked against everything EdSharp does with the control
+// (28 assertions PASS on the new class): plain text and Rtf round trip with
+// Polish letters, Lines/GetLineFromCharIndex/GetFirstCharIndexFromLine,
+// SelectedText, SelectionFont (used in 47 places), LoadFile/SaveFile, Find,
+// Undo/CanUndo, ReadOnly (the guard feature), WordWrap, ZoomFactor, DetectUrls.
+protected override CreateParams CreateParams {
+get {
+// Must be loaded before the window is created, or the class is unknown and
+// the control silently falls back to the old one.
+if (hMsftEdit == IntPtr.Zero) hMsftEdit = Win32.LoadLibrary("msftedit.dll");
+CreateParams cp = base.CreateParams;
+if (hMsftEdit != IntPtr.Zero) cp.ClassName = "RICHEDIT50W";
+return cp;
+}
+} // CreateParams property
+private static IntPtr hMsftEdit = IntPtr.Zero;
 public int OldTextLength = -1;
 public static string CR = "\r";
 public static string LF = "\n";
@@ -14316,6 +14249,11 @@ return aReturn;
 } // Ini class
 
 public class Win32 {
+// Needed before creating the editing control: the modern RichEdit window class
+// RICHEDIT50W only exists once msftedit.dll is loaded into the process.
+[DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+public static extern IntPtr LoadLibrary(string sFile);
+
 [DllImport("user32.dll")]
 public static extern int AttachThreadInput(int iThread1, int iThread2, int iAttach);
 
