@@ -7079,6 +7079,33 @@ if (sFlat.StartsWith(sFirst, StringComparison.Ordinal)) return sFlat.Substring(s
 return sAll.Trim();
 } // GetTextAfterRow method
 
+// What the screen reader ALREADY SAID after a paragraph move, so that we can
+// say only the rest.  This must be the unit the READER asks for, not the one
+// that happens to be convenient for us.
+//
+// MEASURED 17.08.2026 in the reader's own code and on a live control, because
+// guessing this wrong is exactly what produced the last three reports:
+//  - NVDA maps Control with Up/Down to script_caret_moveByParagraph, which
+//    speaks textInfos.UNIT_PARAGRAPH (editableText.py in NVDA's library.zip);
+//  - for a control with editAPIVersion 5 (RICHEDIT50W, which we now create)
+//    that unit is tomParagraph of ITextDocument;
+//  - asking a live RICHEDIT50W control gives, for one long wrapped paragraph,
+//    the WHOLE paragraph -- while rtb.RowText gives only the first VISUAL row.
+// So subtracting RowText left the tail of the paragraph to be spoken a SECOND
+// time whenever word wrap was on, which is the default.  A paragraph made of
+// several HARD lines behaves differently: there the reader says only the first
+// hard line, and the rest genuinely has to be added by us.
+//
+// Both cases are covered by one rule: the reader said everything up to the
+// next HARD line break, so that is what we subtract.
+static string GetTextAfterReaderUnit(string sText) {
+if (sText == null) return "";
+string sAll = sText.Replace(HomerRichTextBox.CR, "").TrimStart();
+int i = sAll.IndexOf('\n');
+if (i < 0) return "";
+return sAll.Substring(i + 1).Trim();
+} // GetTextAfterReaderUnit method
+
 // bReaderSpeaks: the chord that triggered this move is ALSO a screen-reader
 // navigation command, so the reader speaks the destination by itself right
 // after the keystroke.  We must not repeat what it read, or the user hears the
@@ -7096,18 +7123,18 @@ void AnnounceNavigateMessage(string sText, bool bReaderSpeaks) {
 if (sText == null || sText.Trim().Length == 0) return;
 if (bReaderSpeaks) {
 SetStatus(this.statusBar.Items[0].Text + "   " + sText);
-// The reader announces the ROW at the caret, which is NOT the whole
-// paragraph -- reported by Kasperczak (17.08.2026): "kontrol strzalka w
-// gore, w dol, kiedy sa akapity.  On czyta pierwszy wiersz tego akapitu
-// tylko, a nie czyta juz dalej".  MEASURED on a live RICHEDIT50W control:
-// a paragraph of three hard lines makes the reader say only "Punkt
-// pierwszy o zbiorce.", and with word wrap ON a single long paragraph is
-// several VISUAL rows, so again only the first is read.  With word wrap
-// OFF a one-line paragraph is read whole, and then the remainder below is
-// empty and nothing extra is said -- no repetition either way.
+// The reader announces its own paragraph unit, which stops at the next
+// HARD line break -- reported by Kasperczak (17.08.2026): "kontrol
+// strzalka w gore, w dol, kiedy sa akapity.  On czyta pierwszy wiersz
+// tego akapitu tylko, a nie czyta juz dalej".  An EdSharp paragraph is a
+// block between BLANK lines, so it can hold several hard lines and the
+// user lost all but the first.  We therefore add only the remainder; see
+// GetTextAfterReaderUnit for the measurement behind the chosen unit.
+// When the paragraph is a single hard line the remainder is EMPTY and we
+// stay silent, which keeps the earlier double-reading fix intact.
 // Deferred with BeginInvoke so our words are queued after the keystroke
 // has been handled, because the reader speaks after that point too.
-string sRest = GetTextAfterRow(sText, this.Child.RTB.RowText);
+string sRest = GetTextAfterReaderUnit(sText);
 if (sRest.Length > 0) {
 this.BeginInvoke((MethodInvoker) delegate {
 try {Util.Say(sRest, true);} catch {}

@@ -169,8 +169,8 @@ Next Chunk=Alt+RightArrow, Go to next chunk and read it
 Prior Chunk=Alt+LeftArrow, Go to previous chunk and read it
 Next Sentence=Alt+DownArrow, Go to next sentence and read it
 Prior Sentence=Alt+UpArrow, Go to previous sentence and read it
-Next Paragraph=Control+DownArrow, Go to next paragraph; your screen reader reads the first line and EdSharp reads the rest
-Prior Paragraph=Control+UpArrow, Go to previous paragraph; your screen reader reads the first line and EdSharp reads the rest
+Next Paragraph=Control+DownArrow, Go to next paragraph; your screen reader reads it, and EdSharp adds any further lines of the paragraph
+Prior Paragraph=Control+UpArrow, Go to previous paragraph; your screen reader reads it, and EdSharp adds any further lines of the paragraph
 
 Delete Right=Control+Shift+Delete, Delete from cursor to end of line
 Delete Left=Control+Shift+Backspace, Delete from cursor to start of line
