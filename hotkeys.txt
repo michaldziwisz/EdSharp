@@ -167,8 +167,8 @@ Next Word=Control+RightArrow, Go to next word; your screen reader reads it
 Prior Word=Control+LeftArrow, Go to previous word; your screen reader reads it
 Next Chunk=Alt+RightArrow, Go to next chunk and read it
 Prior Chunk=Alt+LeftArrow, Go to previous chunk and read it
-Next Sentence=Alt+DownArrow, Go to next sentence and read it
-Prior Sentence=Alt+UpArrow, Go to previous sentence and read it
+Next Sentence=Alt+DownArrow, Go to next sentence; your screen reader reads it
+Prior Sentence=Alt+UpArrow, Go to previous sentence; your screen reader reads it
 Next Paragraph=Control+DownArrow, Go to next paragraph; your screen reader reads it, and EdSharp adds any further lines of the paragraph
 Prior Paragraph=Control+UpArrow, Go to previous paragraph; your screen reader reads it, and EdSharp adds any further lines of the paragraph
 

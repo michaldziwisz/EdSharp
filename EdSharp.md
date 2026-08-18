@@ -109,7 +109,7 @@ If you need to search for a string that begins with the @ character, precede it 
 
 Press Control+G to go to a percentage point in the document, or Alt+G to repeat the command with the previous value.  Similarly, press Control+J to jump to a line number, or Alt+J to repeat.  A column number may be specified after the line number and a comma.  If no line number is specified before the comma, EdSharp jumps to the column on the current line.
 
-Press Control+RightArrow or Control+LeftArrow to read by word -- stopping at embedded symbols.  Words containing accented letters, such as Polish diacritics, are treated as single words: the editor decides where a word begins and ends itself, because the underlying edit control would otherwise break a word at every accented letter.  Holding Shift as well selects by word.  Press Alt+RightArrow or Alt+LeftArrow to read by chunk -- text delimited only by white space characters.  Press Alt+DownArrow or Alt+UpArrow to read by sentence.  Press Control+DownArrow or Control+UpArrow to read by paragraph, which announces the paragraph once.
+Press Control+RightArrow or Control+LeftArrow to read by word -- stopping at embedded symbols.  Words containing accented letters, such as Polish diacritics, are treated as single words: the editor decides where a word begins and ends itself, because the underlying edit control would otherwise break a word at every accented letter.  Holding Shift as well selects by word.  Press Alt+RightArrow or Alt+LeftArrow to read by chunk -- text delimited only by white space characters.  Press Alt+DownArrow or Alt+UpArrow to move by sentence -- your screen reader announces the sentence itself, because these two keys are its own sentence commands, so EdSharp only moves the cursor and puts the sentence on the status bar.  Press Control+DownArrow or Control+UpArrow to read by paragraph, which announces the paragraph once.
 
 ## Querying
 Use the Address command, Alt+A, to hear the line, column, and percent position of the cursor in the document.  Press Alt+P to hear the full path of the file on disk.  Use the Yield command, Alt+Y, to hear the number of characters, words, and lines contained in all or selected text.  Press Alt+Z to hear whether the document has been modified from the version on disk, or press it again to check its character encoding.
@@ -674,8 +674,8 @@ Next Word=Control+RightArrow, Go to next word (word boundaries follow Unicode le
 Prior Word=Control+LeftArrow, Go to previous word (word boundaries follow Unicode letters, so accented and Polish letters do not split a word); your screen reader reads the word it lands on
 Next Chunk=Alt+RightArrow, Go to next chunk and read it
 Prior Chunk=Alt+LeftArrow, Go to previous chunk and read it
-Next Sentence=Alt+DownArrow, Go to next sentence and read it
-Prior Sentence=Alt+UpArrow, Go to previous sentence and read it
+Next Sentence=Alt+DownArrow, Go to next sentence; your screen reader reads it
+Prior Sentence=Alt+UpArrow, Go to previous sentence; your screen reader reads it
 Next Paragraph=Control+DownArrow, Go to next paragraph; your screen reader reads the paragraph it recognises, EdSharp adds any further lines of the EdSharp paragraph, and the whole paragraph is also placed on the status bar
 Prior Paragraph=Control+UpArrow, Go to previous paragraph; your screen reader reads the paragraph it recognises, EdSharp adds any further lines of the EdSharp paragraph, and the whole paragraph is also placed on the status bar
 

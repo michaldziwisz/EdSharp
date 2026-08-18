@@ -4624,11 +4624,15 @@ NavigatePriorMatch(App.MatchChunk);
 }
 
 if (menuItem == menuNavigateNextSentence) {
-NavigateNextMatch(App.MatchSentence);
+// Alt with Down is a screen reader sentence command too, and the reader
+// speaks the whole destination itself -- we only move the caret.
+NavigateNextMatchReaderSaysAll(App.MatchSentence);
 }
 
 if (menuItem == menuNavigatePriorSentence) {
-NavigatePriorMatch(App.MatchSentence);
+// Alt with Up is a screen reader sentence command too, and the reader
+// speaks the whole destination itself -- we only move the caret.
+NavigatePriorMatchReaderSaysAll(App.MatchSentence);
 }
 
 if (menuItem == menuNavigateNextParagraph) {
@@ -7058,6 +7062,35 @@ Util.Spell(sText);
 // caller of them, stay exactly as they were.
 bool bNavigateReaderSpeaks = false;
 
+// Set for the duration of one Navigate* call when the screen reader speaks the
+// WHOLE destination by itself, so we must add nothing at all -- Alt with Up or
+// Down (sentence).  Kept separate from bNavigateReaderSpeaks, which means "the
+// reader spoke only up to the next hard line break, add the remainder".
+//
+// MEASURED 18.08.2026, because the difference is exactly what made the last
+// three attempts wrong:
+//  - NVDA maps kb:alt+upArrow and kb:alt+downArrow to caret_previousSentence
+//    and caret_nextSentence (source/editableText.py), so the chord is the
+//    reader's own;
+//  - _caretMoveBySentenceHelper sends the key to us, then waits at most
+//    config.conf["editableText"]["caretMoveTimeoutMs"] -- DEFAULT 100 ms
+//    (config/configSpec.py) -- for the caret to move.  If it notices the move
+//    it speaks UNIT_LINE, and if it does not it moves by UNIT_SENTENCE itself
+//    and speaks the sentence.  Either way it SPEAKS;
+//  - our own move takes about 124 ms, because the setter of
+//    HomerRichTextBox.Index ends with DoEvents plus Thread.Sleep(100), so we
+//    land on the edge of that 100 ms window and the user drifts between the two
+//    branches.  That is what Kasperczak described (17.08.2026): "Tak, czyta 2
+//    razy, ale tak jakby tez nie zawsze" -- the "not always" is the race, not
+//    an inconsistent screen reader.
+// Staying silent does NOT cost the feature: in the second branch the reader
+// navigates sentences in this control by itself, measured on a live RICHEDIT50W
+// control where Move(tomSentence) succeeds and Expand(tomSentence) returns the
+// sentence.  Subtracting a "remainder" here, as we do for paragraphs, would
+// bring the double reading straight back, because the reader's unit for this
+// chord is a whole line or a whole sentence, not a first hard line.
+bool bNavigateReaderSaysAll = false;
+
 void AnnounceNavigateMessage(string sText) {
 bool bReaderSpeaks = false;
 AnnounceNavigateMessage(sText, bReaderSpeaks);
@@ -7121,6 +7154,14 @@ return sAll.Substring(i + 1).Trim();
 // silent.
 void AnnounceNavigateMessage(string sText, bool bReaderSpeaks) {
 if (sText == null || sText.Trim().Length == 0) return;
+// The reader says the WHOLE destination for this chord, so we add nothing to
+// speech.  The text still goes to the status bar, which a screen reader reads
+// only on request, so nothing is lost for a user who wants to check it.  See
+// bNavigateReaderSaysAll for the measurement.
+if (this.bNavigateReaderSaysAll) {
+SetStatus(this.statusBar.Items[0].Text + "   " + sText);
+return;
+}
 if (bReaderSpeaks) {
 SetStatus(this.statusBar.Items[0].Text + "   " + sText);
 // The reader announces its own paragraph unit, which stops at the next
@@ -7150,6 +7191,22 @@ public void NavigateNextMatch(string sMatch) {
 bool bLine = false;
 NavigateNextMatch(sMatch, bLine);
 } // NavigateNextMatch method
+
+// Move without saying anything, because the screen reader speaks the whole
+// destination for this chord by itself; see bNavigateReaderSaysAll.
+public void NavigateNextMatchReaderSaysAll(string sMatch) {
+this.bNavigateReaderSaysAll = true;
+try { NavigateNextMatch(sMatch, false); }
+finally { this.bNavigateReaderSaysAll = false; }
+} // NavigateNextMatchReaderSaysAll method
+
+// Move without saying anything, because the screen reader speaks the whole
+// destination for this chord by itself; see bNavigateReaderSaysAll.
+public void NavigatePriorMatchReaderSaysAll(string sMatch) {
+this.bNavigateReaderSaysAll = true;
+try { NavigatePriorMatch(sMatch, false); }
+finally { this.bNavigateReaderSaysAll = false; }
+} // NavigatePriorMatchReaderSaysAll method
 
 // Overload taking bReaderSpeaks; see AnnounceNavigateMessage for why a
 // reader-claimed chord must not be announced by us as well.
@@ -12782,12 +12839,15 @@ lVal.RemoveAt(i);
 lDisp.RemoveAt(i);
 lb.Items.RemoveAt(i);
 if (lb.Items.Count == 0) {
-if (bSpeak) App.Frame.AddMessage("No items");
+if (bSpeak) App.Frame.AddMessage("List is now empty");
 return;
 }
 if (i >= lb.Items.Count) i = lb.Items.Count - 1;
 lb.SelectedIndex = i;
-if (bSpeak) App.Frame.AddMessage("Removed");
+// Say WHICH removal happened.  A bare "Removed" is ambiguous next to
+// Shift+Delete, which erases the file from disk, and a screen reader user
+// has no other way to tell the two apart after the fact.
+if (bSpeak) App.Frame.AddMessage("Removed from list");
 } // PickFileRemoveEntry method
 
 // Permanently delete the current file from disk after an explicit
@@ -12800,7 +12860,7 @@ if (i < 0 || i >= lVal.Count) return;
 string sFile = lVal[i];
 if (sFile.Length == 0) return;
 try {
-if (Directory.Exists(sFile)) { App.Frame.AddMessage("Not a file"); return; }
+if (Directory.Exists(sFile)) { App.Frame.AddMessage("This is a folder, not a file"); return; }
 if (!File.Exists(sFile)) {
 if (Dialog.Confirm("Confirm", "File not found on disk. Remove this entry from the list?\n" + sFile, "N") != "Y") return;
 PickFileRemoveEntry(lb, lVal, lDisp, sSection, i, true);
