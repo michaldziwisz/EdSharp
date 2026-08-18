@@ -613,6 +613,7 @@ public class LbcDialog : IDisposable
     private const int DefaultPadding      = 12;
     private const int DefaultRowGap       = 6;
     private const int DefaultStatusHeight = 22;
+    private const int DefaultTreeHeight   = 260;
 
     // Layout state. Built up by add* calls, consumed by runX.
     // Alphabetical declarations.
@@ -1106,6 +1107,56 @@ public class LbcDialog : IDisposable
             if (sItem.Contains(sLowerNeedle)) return j;
         }
         return -1;
+    }
+
+    // addTreeView: a hierarchical pick control. The screen-reader
+    // counterpart of addListBox for content that is a TREE rather
+    // than a flat list -- a document's headings, an outline, a
+    // folder hierarchy. Screen readers announce a TreeView item's
+    // level and its expanded/collapsed state natively, which is
+    // exactly the information a flat list cannot carry, so the user
+    // hears "Installation, level 2, collapsed" and can skip a whole
+    // branch instead of arrowing through every child.
+    //
+    // Accessibility notes (learned from the list boxes above):
+    //   - HideSelection=false keeps the highlighted node visible and
+    //     reported while focus is elsewhere in the dialog.
+    //   - Letter navigation is built into TreeView (type-ahead on the
+    //     node labels), so no extra key handling is needed for it.
+    //   - LabelEdit stays OFF: F2 inside the tree must not start
+    //     renaming a node in a read-only picker.
+    //   - The tip goes to the status bar like every other control, so
+    //     it must stay SHORT; register long key lists via
+    //     setHelpDetail instead.
+    public TreeView addTreeView(string sTip)
+    {
+        TreeView tv = new TreeView();
+        tv.Size = new Size(innerWidth(), DefaultTreeHeight);
+        tv.TabIndex = iTabIndex++;
+        tv.Margin = new Padding(0, 0, 0, DefaultRowGap);
+        tv.HideSelection = false;
+        tv.LabelEdit = false;
+        tv.ShowLines = true;
+        tv.ShowPlusMinus = true;
+        tv.ShowRootLines = true;
+        tv.PathSeparator = "\\";
+        Label lblLast = currentLabelOrNull();
+        if (lblLast != null) tv.AccessibleName = lblLast.AccessibleName;
+        tv.GotFocus += handleGotFocus;
+        registerWidget(tv, "TreeView", tv.AccessibleName);
+        if (!string.IsNullOrEmpty(sTip)) dFocusTips[tv] = sTip;
+        pnlStack.Controls.Add(tv);
+        if (ctlFirstFocusable == null) ctlFirstFocusable = tv;
+        return tv;
+    }
+
+    // addPickTree: labeled variant, mirroring addPickBox.
+    public TreeView addPickTree(string sLabel, string sTip)
+    {
+        addFieldLabel(sLabel);
+        TreeView tv = addTreeView(sTip);
+        tv.AccessibleName = cleanLabel(sLabel);
+        return tv;
     }
 
     // addPickBox: labeled pick-one list. Equivalent to AddPickBox

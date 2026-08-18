@@ -482,6 +482,12 @@ public string LastClipboardText = "";
 	public bool MarkdownReviewNoSync = false;
 	public int MarkdownReviewSavedEditPos = -1;
 	public int MarkdownReviewSavedEditLength = 0;
+	// Document Navigation (F6): the character offset of the heading that was
+	// selected in the tree when it was last closed, so reopening the tree
+	// returns to the reader's place. Per window, not persisted to disk -- it is
+	// reading position within one editing session, like a scroll position.
+	// -1 means "never opened in this window".
+	public int DocumentNavigationLastOffset = -1;
 private string sFile = "";
 public string File {
 get {
@@ -853,7 +859,7 @@ public MenuStrip menuMain;
 public ToolStripMenuItem menuFile, menuFileNew, menuFileNewFromClipboard, menuFileOpen, menuFileOpenOtherFormat, menuFileOpenAgain, menuFileRecent, menuFileSetFavorite, menuFileClearFavorite, menuFileListFavorites, menuFileFind, menuFileSave, menuFileSaveAs, menuFileSaveCopy, menuFileExport, menuFileRename, menuFileProperties, menuFileMailBody, menuFileMailAttach, menuFilePrint, menuFileRun, menuFileCurrentWindows, menuFileClose, menuFileCloseAllButCurrentWindow, menuFileSlots, menuFileExit;
 public ToolStripMenuItem menuEdit, menuEditSelectAll, menuEditUnselectAll, menuEditCopy, menuEditCopyAppend, menuEditCopyRichText, menuEditCut, menuEditCutAppend, menuEditPaste, menuEditPasteFile, menuEditUndo, menuEditRedo, menuEditStartSelection, menuEditCompleteSelection, menuEditReselect, menuEditCopyAll, menuEditSelectChunk, menuEditAppendFromClipboard, menuEditQuote, menuEditUnquote, menuEditUpperCase, menuEditLowerCase, menuEditProperCase, menuEditSwapCase, menuEditYieldEncoding, menuEditJoinLines, menuEditHardLineBreak, menuEditEnterNewLine, menuEditIndentNewLine, menuEditIndentNewLinePrior, menuEditIndent, menuEditOutdent, menuEditAlign, menuEditIndentMode, menuEditJustify, menuEditStyle, menuEditBaseline, menuEditSetSelectionFont;
 public ToolStripMenuItem menuDelete, menuDeleteReplaceRegular, menuDeleteReplaceWithRegExp, menuDeleteHardLine, menuDeleteParagraph, menuDeleteLine, menuDeleteRight, menuDeleteLeft, menuDeleteDown, menuDeleteUp, menuDeleteFile, menuDeleteTrimBlanks;
-public ToolStripMenuItem menuNavigate, menuNavigateForwardFind, menuNavigateReverseFind, menuNavigateForwardFindWithRegExp, menuNavigateReverseFindWithRegExp,  menuNavigateForwardFindAtCursor, menuNavigateReverseFindAtCursor, menuNavigateForwardFindAgain, menuNavigateReverseFindAgain, menuNavigateJumpToLine, menuNavigateJumpToLineAgain, menuNavigateGoToPercent, menuNavigateGoToPercentAgain, menuNavigateGoToPart, menuNavigateSetBookmark, menuNavigateClearBookmark, menuNavigateGoToBookmark, menuNavigateHomeCharacter, menuNavigateEndCharacter, menuNavigateStartTag, menuNavigateEndTag,  menuNavigateNextJustify, menuNavigatePriorJustify, menuNavigateNextStyle, menuNavigatePriorStyle, menuNavigateNextBaseline, menuNavigatePriorBaseline, menuNavigateNextFont, menuNavigatePriorFont, menuNavigateRightBrace, menuNavigateNextBlock, menuNavigatePriorBlock, menuNavigateLeftBrace, menuNavigateNextIndent, menuNavigatePriorIndent, menuNavigateNextChunk,  menuNavigatePriorChunk, menuNavigateNextSentence, menuNavigatePriorSentence, menuNavigateNextParagraph, menuNavigatePriorParagraph, menuNavigateNextPart, menuNavigatePriorPart, menuNavigateNextSection, menuNavigatePriorSection, menuNavigateNextSectionSameLevel, menuNavigatePriorSectionSameLevel, menuNavigateGoToSection, menuNavigateGoToContents, menuNavigateSearchForTopic, menuNavigateSearchForTopicAgain, menuNavigateGoToStartOfSelection, menuNavigateNextBookmark, menuNavigatePriorBookmark;
+public ToolStripMenuItem menuNavigate, menuNavigateForwardFind, menuNavigateReverseFind, menuNavigateForwardFindWithRegExp, menuNavigateReverseFindWithRegExp,  menuNavigateForwardFindAtCursor, menuNavigateReverseFindAtCursor, menuNavigateForwardFindAgain, menuNavigateReverseFindAgain, menuNavigateJumpToLine, menuNavigateJumpToLineAgain, menuNavigateGoToPercent, menuNavigateGoToPercentAgain, menuNavigateGoToPart, menuNavigateSetBookmark, menuNavigateClearBookmark, menuNavigateGoToBookmark, menuNavigateHomeCharacter, menuNavigateEndCharacter, menuNavigateStartTag, menuNavigateEndTag,  menuNavigateNextJustify, menuNavigatePriorJustify, menuNavigateNextStyle, menuNavigatePriorStyle, menuNavigateNextBaseline, menuNavigatePriorBaseline, menuNavigateNextFont, menuNavigatePriorFont, menuNavigateRightBrace, menuNavigateNextBlock, menuNavigatePriorBlock, menuNavigateLeftBrace, menuNavigateNextIndent, menuNavigatePriorIndent, menuNavigateNextChunk,  menuNavigatePriorChunk, menuNavigateNextSentence, menuNavigatePriorSentence, menuNavigateNextParagraph, menuNavigatePriorParagraph, menuNavigateNextPart, menuNavigatePriorPart, menuNavigateNextSection, menuNavigatePriorSection, menuNavigateNextSectionSameLevel, menuNavigatePriorSectionSameLevel, menuNavigateGoToSection, menuNavigateGoToContents, menuNavigateSearchForTopic, menuNavigateSearchForTopicAgain, menuNavigateGoToStartOfSelection, menuNavigateNextBookmark, menuNavigatePriorBookmark, menuNavigateDocumentNavigation;
 public ToolStripMenuItem menuQuery, menuQueryAddress, menuQueryBraces, menuQueryBlock, menuQueryIndent, menuQueryPath, menuQueryTopic, menuQueryYield, menuQueryStatus, menuQueryCompiler, menuQuerySelected, menuQueryChunk, menuQueryReadAll, menuQueryWindowsOpen, menuQueryClipboard, menuQueryTime, menuQueryStyles, menuQueryFont;
 public ToolStripMenuItem menuMisc, menuMiscSetDefaultFont, menuMiscConfigurationOptions, menuMiscManualOptions, menuMiscResetConfiguration, menuMiscGoToFolder, menuMiscGoToSpecialFolder, menuMiscWordWrap, menuMiscUnwrap, menuMiscExtraSpeechToggle, menuMiscExtraSpeechLog, menuMiscEnvironmentVariables, menuMiscSpellCheck, menuMiscThesaurus, menuMiscLookupTerm, menuMiscTranslateLanguage, menuMiscGuardDocument, menuMiscNoGuard, menuMiscPyBrace, menuMiscPyDent, menuMiscInferIndent, menuMiscFormatCode, menuMiscRepeatLine, menuMiscSectionBreak, menuMiscPathToClipboard, menuMiscPathList, menuMiscInsertTime, menuMiscCalculateDate, menuMiscTextConvert, menuMiscTextCombine, menuMiscTextContents, menuMiscYieldWithRegExp, menuMiscExtractWithRegExp, menuMiscRunAtCursor, menuMiscSpecialCharacter, menuMiscEvaluateExpression, menuMiscReplaceTokens, menuMiscTransformFiles, menuMiscGoToEnvironment, menuMiscCompile, menuMiscPickCompiler, menuMiscPromptCommand, menuMiscReviewOutput, menuMiscSaveSnippet, menuMiscInvokeSnippet, menuMiscViewSnippet, menuMiscKeepUniqueItems, menuMiscNumberItems, menuMiscOrderItems, menuMiscReverseItems, menuMiscListDifferentItems, menuMiscQueryCommonItems, menuMiscExplorerFolder, menuMiscCommandPrompt, menuMiscBurnToCD, menuMiscWebDownload, menuMiscWebClientUtilities;
 public ToolStripMenuItem menuWindow, menuWindowNext, menuWindowPrior, menuWindowArrangeIcons, menuWindowCascade, menuWindowTileHorizontal, menuWindowTileVertical;
@@ -1031,12 +1037,27 @@ menuNavigatePriorSection= CreateMenuItem("Prior Section", "Control+PageUp", menu
 // walk headings of one level in a browser.
 menuNavigateNextSectionSameLevel= CreateMenuItem("Next Section at Same Level", "Control+Shift+PageDown", menuItem_Click, "child silent");
 menuNavigatePriorSectionSameLevel= CreateMenuItem("Prior Section at Same Level", "Control+Shift+PageUp", menuItem_Click, "child silent");
-menuNavigateGoToSection= CreateMenuItem("Go to Section", "F6", menuItem_Click, "child speak");
+// Document Navigation, F6 -- a tree of the document's Markdown headings,
+// the way a book reader (PaperBack) presents a table of contents: branches
+// expand and collapse, letter keys jump, Enter moves the cursor to that
+// heading in the text, and reopening the tree returns to the place last
+// focused. Requested by Michal Kasperczak (18.08.2026 23:43), who also
+// decided that F6 takes precedence over whatever else used F6: "To F6
+// zastapi ewentualne inne funkcje F6." So the old structured-text command
+// Go to Section moved off F6 (see below). With no heading in the document
+// the command only says so and opens nothing -- his decision (23:46:18):
+// "Komunikat, tak jak mowisz. I tyle."
+menuNavigateDocumentNavigation = CreateMenuItem("Document Navigation ...", "F6", menuItem_Click, "child silent");
+// Go to Section belongs to the ORIGINAL structured-text model (a line of
+// dashes plus a form feed separating sections), which EdSharpNG replaced
+// with Markdown headings -- in a .md file it can only answer "Not found!".
+// It keeps working on old structured files, just on a free chord now.
+menuNavigateGoToSection= CreateMenuItem("Go to Section", "Control+Shift+F12", menuItem_Click, "child speak");
 menuNavigateGoToContents = CreateMenuItem("Go to Contents", "Shift+F6", menuItem_Click, "child speak");
 menuNavigateSearchForTopic = CreateMenuItem("Search for Topic ...", "Control+F6", menuItem_Click, "child silent");
 menuNavigateSearchForTopicAgain = CreateMenuItem("Search for Topic Again", "Alt+F6", menuItem_Click, "child silent");
 menuNavigateGoToStartOfSelection = CreateMenuItem("Go to Start of Selection", "Alt+Shift+F8", menuItem_Click, "child speak");
-menuNavigate.DropDownItems.AddRange(new ToolStripItem[] {menuNavigateForwardFind, menuNavigateReverseFind, menuNavigateForwardFindWithRegExp, menuNavigateReverseFindWithRegExp,  menuNavigateForwardFindAtCursor, menuNavigateReverseFindAtCursor, menuNavigateForwardFindAgain, menuNavigateReverseFindAgain, menuNavigateJumpToLine, menuNavigateJumpToLineAgain, menuNavigateGoToPercent, menuNavigateGoToPercentAgain, menuNavigateGoToPart, menuNavigateSetBookmark, menuNavigateClearBookmark, menuNavigateGoToBookmark, menuNavigateNextBookmark, menuNavigatePriorBookmark, menuNavigateHomeCharacter, menuNavigateEndCharacter, menuNavigateStartTag, menuNavigateEndTag,  menuNavigateNextJustify, menuNavigatePriorJustify, menuNavigateNextStyle, menuNavigatePriorStyle, menuNavigateNextBaseline, menuNavigatePriorBaseline, menuNavigateNextFont, menuNavigatePriorFont, menuNavigateRightBrace, menuNavigateNextBlock, menuNavigatePriorBlock, menuNavigateLeftBrace, menuNavigateNextIndent, menuNavigatePriorIndent, menuNavigateNextChunk,  menuNavigatePriorChunk, menuNavigateNextSentence, menuNavigatePriorSentence, menuNavigateNextParagraph, menuNavigatePriorParagraph, menuNavigateNextPart, menuNavigatePriorPart, menuNavigateNextSection, menuNavigatePriorSection, menuNavigateNextSectionSameLevel, menuNavigatePriorSectionSameLevel, menuNavigateGoToSection, menuNavigateGoToContents, menuNavigateSearchForTopic, menuNavigateSearchForTopicAgain, menuNavigateGoToStartOfSelection});
+menuNavigate.DropDownItems.AddRange(new ToolStripItem[] {menuNavigateForwardFind, menuNavigateReverseFind, menuNavigateForwardFindWithRegExp, menuNavigateReverseFindWithRegExp,  menuNavigateForwardFindAtCursor, menuNavigateReverseFindAtCursor, menuNavigateForwardFindAgain, menuNavigateReverseFindAgain, menuNavigateJumpToLine, menuNavigateJumpToLineAgain, menuNavigateGoToPercent, menuNavigateGoToPercentAgain, menuNavigateGoToPart, menuNavigateSetBookmark, menuNavigateClearBookmark, menuNavigateGoToBookmark, menuNavigateNextBookmark, menuNavigatePriorBookmark, menuNavigateHomeCharacter, menuNavigateEndCharacter, menuNavigateStartTag, menuNavigateEndTag,  menuNavigateNextJustify, menuNavigatePriorJustify, menuNavigateNextStyle, menuNavigatePriorStyle, menuNavigateNextBaseline, menuNavigatePriorBaseline, menuNavigateNextFont, menuNavigatePriorFont, menuNavigateRightBrace, menuNavigateNextBlock, menuNavigatePriorBlock, menuNavigateLeftBrace, menuNavigateNextIndent, menuNavigatePriorIndent, menuNavigateNextChunk,  menuNavigatePriorChunk, menuNavigateNextSentence, menuNavigatePriorSentence, menuNavigateNextParagraph, menuNavigatePriorParagraph, menuNavigateNextPart, menuNavigatePriorPart, menuNavigateNextSection, menuNavigatePriorSection, menuNavigateNextSectionSameLevel, menuNavigatePriorSectionSameLevel, menuNavigateDocumentNavigation, menuNavigateGoToSection, menuNavigateGoToContents, menuNavigateSearchForTopic, menuNavigateSearchForTopicAgain, menuNavigateGoToStartOfSelection});
 //Dialog.Show("Navigate.", menuNavigate.DropDownItems.Count);
 
 menuQuery = CreateMenu("&Query");
@@ -4680,6 +4701,10 @@ GoToAdjacentMarkdownHeading(rtb, false, true);
 
 if (menuItem == menuNavigatePriorSectionSameLevel) {
 GoToAdjacentMarkdownHeading(rtb, true, true);
+}
+
+if (menuItem == menuNavigateDocumentNavigation) {
+ShowDocumentNavigationTree(rtb);
 }
 
 if (menuItem == menuNavigateGoToSection) {
@@ -9066,6 +9091,127 @@ if (keyData != Keys.Enter && hashKey.ContainsKey(keyData)) return false;
 				AddMessage("Heading " + iLevel);
 				} // InsertMarkdownHeadingAtCursor method
 
+				// Document Navigation, F6.  The document's Markdown headings shown as a
+				// TREE the way a book reader (PaperBack, and the old MHT/CHM help
+				// viewers) shows a table of contents: sub-headings hang under their
+				// parent, a branch expands and collapses, letter keys jump, and Enter
+				// moves the editor cursor to that heading in the text.
+				//
+				// Kasperczak's specification (Telegram 18.08.2026 23:43-23:46):
+				//   "F6 jako Nawigacje po dokumencie, cos jak w Paperback czytnik
+				//   ksiazek.  Czyli drzewo z rozwijanymi naglowkami/podnaglowkami.
+				//   Literowa nawigacja dziala, Enter skacze do tego naglowka w tekscie,
+				//   F6 otwiera drzewo i pamieta ostatnie zaokusowane miejsce."
+				//   "Czyli taka nawigacja, jak kiedys w plikach MHT byla."
+				//   Empty document: "Komunikat, tak jak mowisz. I tyle." -- so with no
+				//   heading the command SPEAKS and opens NOTHING.
+				//
+				// Why a TreeView and not the existing flat element list (F7 in preview):
+				// a screen reader announces a tree node's LEVEL and its expanded or
+				// collapsed state by itself, which is the whole point of the request --
+				// the user hears "Installation, level 2, collapsed" and can step over a
+				// whole branch.  A flat list cannot carry that.
+				//
+				// "Remembers the last focused place": the heading that was selected when
+				// the tree was last closed, per window, kept in MdiChild.  On first open
+				// (or when that heading is gone after editing) the selection falls back
+				// to the heading the cursor is currently in, which is what a reader
+				// expects when opening the contents while reading.
+				private void ShowDocumentNavigationTree(HomerRichTextBox rtb) {
+				if (rtb == null) return;
+				MdiChild child = this.Child;
+				if (child == null) return;
+
+				string sText = rtb.Text ?? "";
+				List<MarkdownSectionHeading> headings = GetMarkdownSectionHeadings(sText);
+				if (headings.Count == 0) {
+				// His decision: only a message, no empty window to escape from.
+				AddMessage("No headings!");
+				return;
+				}
+
+				// Build the tree.  Each node's Tag carries the heading's character
+				// offset, so the jump never depends on the node's position or label.
+				// A heading deeper than its predecessor becomes its child; equal or
+				// shallower climbs back up.  Levels may skip (h1 then h3) and a file
+				// may start at h2 -- both are normal in real documents, so parenting
+				// walks up the open branch instead of assuming level == depth.
+				LbcDialog dlg = new LbcDialog("Document Navigation", App.Frame);
+				TreeView tv = dlg.addTreeView("Enter goes to the heading");
+				dlg.setHelpDetail(tv, "Keys: Up and Down Arrow move, Right Arrow expands a heading, Left Arrow collapses it or goes to the parent, typing letters jumps to a heading starting with them, Enter goes to the selected heading in the text, Escape closes without moving. The tree reopens where you left it.");
+
+				List<TreeNode> nodes = new List<TreeNode>();
+				List<int> nodeLevels = new List<int>();
+				tv.BeginUpdate();
+				for (int i = 0; i < headings.Count; i++) {
+				MarkdownSectionHeading heading = headings[i];
+				TreeNode node = new TreeNode(GetMarkdownSectionHeadingTitle(heading));
+				node.Tag = heading.Start;
+
+				TreeNode parent = null;
+				for (int j = nodes.Count - 1; j >= 0; j--) {
+				if (nodeLevels[j] < heading.Level) {parent = nodes[j]; break;}
+				}
+				if (parent == null) tv.Nodes.Add(node);
+				else parent.Nodes.Add(node);
+
+				nodes.Add(node);
+				nodeLevels.Add(heading.Level);
+				}
+				// Start fully expanded so Down Arrow alone walks the whole document;
+				// collapsing is the user's choice, not a state we impose.
+				tv.ExpandAll();
+				tv.EndUpdate();
+
+				// Where to put the selection.  Remembered heading first (his "pamieta
+				// ostatnie zaokusowane miejsce"), then the heading the cursor sits in.
+				int iSelect = -1;
+				if (child.DocumentNavigationLastOffset >= 0) {
+				for (int i = 0; i < headings.Count; i++) {
+				if (headings[i].Start == child.DocumentNavigationLastOffset) {iSelect = i; break;}
+				}
+				}
+				if (iSelect < 0) iSelect = GetCurrentMarkdownSectionHeadingIndex(headings, rtb.Index);
+				if (iSelect < 0) iSelect = 0;
+				tv.SelectedNode = nodes[iSelect];
+				dlg.setInitialFocus(tv);
+
+				// Enter inside the tree accepts the dialog.  A TreeView swallows Enter
+				// on its own, so without this the key would do nothing where the user
+				// most expects it to act.
+				tv.KeyDown += delegate(object oSender, KeyEventArgs ev) {
+				if (ev.KeyData != Keys.Enter) return;
+				ev.Handled = true; ev.SuppressKeyPress = true;
+				Form frmHost = tv.FindForm();
+				if (frmHost == null) return;
+				frmHost.DialogResult = DialogResult.OK;
+				frmHost.Close();
+				};
+
+				bool bOk = dlg.runOkCancel();
+				TreeNode chosen = tv.SelectedNode;
+				int iTarget = -1;
+				if (chosen != null && chosen.Tag is int) iTarget = (int) chosen.Tag;
+				dlg.Dispose();
+
+				// Remember the place even when the user escaped: reopening the contents
+				// should land where they were reading, whether or not they jumped.
+				if (iTarget >= 0) child.DocumentNavigationLastOffset = iTarget;
+				if (!bOk || iTarget < 0) return;
+
+				if (iTarget > sText.Length) iTarget = sText.Length;
+				rtb.Index = iTarget;
+				// Announce exactly like the heading navigation commands do, so the two
+				// ways of reaching a heading sound identical: text, then level.  Forced
+				// speech (cancel + global) because the dialog closing moves focus and a
+				// plain message would be lost under the control's own announcement.
+				int iLanded = GetCurrentMarkdownSectionHeadingIndex(headings, iTarget);
+				string sMessage = "";
+				if (iLanded >= 0) sMessage = GetMarkdownSectionHeadingTitle(headings[iLanded]) + ", heading " + headings[iLanded].Level;
+				else sMessage = rtb.RowText;
+				AnnounceSectionMoveMessage(sMessage);
+				} // ShowDocumentNavigationTree method
+
 				private static int GetCurrentMarkdownSectionHeadingIndex(List<MarkdownSectionHeading> headings, int iCurrent) {
 				int iHeading = -1;
 				for (int i = 0; i < headings.Count; i++) {
@@ -9106,9 +9252,23 @@ if (keyData != Keys.Enter && hashKey.ContainsKey(keyData)) return false;
 				return heading.Title;
 				} // GetMarkdownSectionHeadingTitle method
 
+				// Every command that understands a "section" as a Markdown heading reads
+				// this list: Control+Enter (insert), Control+PageUp/PageDown and their
+				// Shift variants (navigate), Control+Alt+Up/Down (move a section), and
+				// the F6 Document Navigation tree.
+				//
+				// FENCE AWARENESS (added 19.08.2026, found by the F6 harness): a '#'
+				// line inside a fenced code block is NOT a heading -- in a document about
+				// Markdown, shell scripts, or INI files, '# something' inside ``` is a
+				// comment or an example. Without this the tree listed phantom headings
+				// and every heading navigation command stopped on them. The fence ranges
+				// come from MarkdownReview_FindFenceRanges, the SAME helper the preview
+				// uses, so the outline and the preview cannot disagree.
 				private static List<MarkdownSectionHeading> GetMarkdownSectionHeadings(string sText) {
 				List<MarkdownSectionHeading> headings = new List<MarkdownSectionHeading>();
 				if (String.IsNullOrEmpty(sText)) return headings;
+
+				List<int[]> fences = MarkdownReview_FindFenceRanges(sText);
 
 				int iStart = 0;
 				while (iStart <= sText.Length) {
@@ -9117,9 +9277,14 @@ if (keyData != Keys.Enter && hashKey.ContainsKey(keyData)) return false;
 				string sLine = sText.Substring(iStart, iEnd - iStart);
 				if (sLine.EndsWith("\r")) sLine = sLine.Substring(0, sLine.Length - 1);
 
+				bool bInFence = false;
+				for (int i = 0; i < fences.Count; i++) {
+				if (iStart >= fences[i][0] && iStart < fences[i][1]) {bInFence = true; break;}
+				}
+
 				int iLevel;
 				string sTitle;
-				if (TryGetMarkdownSectionHeadingLine(sLine, out iLevel, out sTitle)) {
+				if (!bInFence && TryGetMarkdownSectionHeadingLine(sLine, out iLevel, out sTitle)) {
 				headings.Add(new MarkdownSectionHeading {Start = iStart, Level = iLevel, Title = sTitle});
 				}
 
