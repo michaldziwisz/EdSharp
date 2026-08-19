@@ -2,7 +2,9 @@
 
 Lista jest po polsku, ale komunikaty programu podaję po angielsku, bo interfejs jest angielski i tak je usłyszysz.
 
-Czego ta lista NIE jest: potwierdzeniem, że wszystko działa. Sprawdzam u siebie logikę w kodzie, czyli to, jaki tekst program wyliczy i gdzie postawi kursor. Tego, CO REALNIE WYMÓWI czytnik ekranu na Twoim komputerze, nie mam czym zmierzyć - nie mam ani NVDA, ani JAWS-a. Dlatego każdy test o mowie jest tu po to, żebyś Ty go rozstrzygnął, a nie po to, żebyś potwierdził moje ustalenie.
+Czego ta lista NIE jest: potwierdzeniem, że wszystko działa. Sprawdzam u siebie logikę w kodzie, czyli to, jaki tekst program wyliczy i gdzie postawi kursor.
+
+AKTUALIZACJA 19.08.2026: część testów o mowie potrafię już rozstrzygnąć SAM. Na maszynie z Windowsem stoi NVDA 2026.1.1 z mostkiem MCP, a do pomiaru tego, co czytnik REALNIE wymawia, dorobiłem dodatek "podsluchMowy" (zapisuje każdą wypowiedź NVDA do pliku). Wyniki zmierzone tą drogą są opisane niżej przy poszczególnych testach jako "ZMIERZONE". Nadal jednak nie mam JAWS-a, a testy 3.1 do 3.5 (zdania, słowa, akapity) pozostają dla Ciebie, bo klawisze wysyłane programowo przesuwają kursor, ale nie wywołują u NVDA reakcji mowy na ruch karetki - kontrola pozytywna (zwykła strzałka, która MUSI mówić) też milczała, więc to ograniczenie mojego pomiaru, nie wada programu.
 
 Jak zgłaszać: wystarczy numer testu i jedno zdanie, co usłyszałeś albo co się stało. Nie musisz przechodzić listy po kolei ani całej. Testy oznaczone jako pilne to te, których u siebie w ogóle nie sprawdziłem.
 
@@ -12,13 +14,19 @@ Do testów przyda się jeden plik z nagłówkami Markdown i kilkoma akapitami. T
 
 1.1. Otwórz plik z nagłówkami i naciśnij F6. Oczekiwane: otwiera się okno "Document Navigation" z drzewem nagłówków, kursor w drzewie stoi na nagłówku, w którym byłeś w tekście.
 
+ZMIERZONE 19.08.2026 (NVDA 2026.1.1): okno się otwiera, NVDA ogłasza "Document Navigation", potem "Enter goes to the heading, drzewo". Kursor w drzewie stanął na nagłówku, w którym byłem w tekście.
+
 1.2. W drzewie chodź strzałkami w górę i w dół. Oczekiwane: czytnik wymawia tytuł nagłówka, jego poziom i - przy nagłówku, który ma podnagłówki - czy gałąź jest zwinięta czy rozwinięta. To jest ten test, na którym najbardziej mi zależy: czy słyszysz poziom i stan gałęzi.
+
+ZMIERZONE 19.08.2026: OBIE rzeczy słyszalne. Przy wejściu do drzewa NVDA mówi dosłownie "Podsumowanie, 3 z 3, poziom 1". Przy strzałce w lewo na nagłówku z podnagłówkami: "zwinięte", przy strzałce w prawo: "rozwinięte, 3 elementy". Uwaga: poziomu NVDA nie powtarza przy przechodzeniu MIĘDZY nagłówkami tego samego poziomu - tak zachowuje się każde drzewo w Windows, to nie wada programu.
 
 1.3. Strzałka w prawo na nagłówku z podnagłówkami. Oczekiwane: gałąź się rozwija. Strzałka w lewo: zwija ją, a na już zwiniętej przenosi na nagłówek nadrzędny.
 
 1.4. Wpisz literę. Oczekiwane: przeskok do najbliższego nagłówka zaczynającego się od tej litery.
 
 1.5. Ustaw się na wybranym nagłówku i naciśnij Enter. Oczekiwane: okno się zamyka, kursor w tekście stoi na tym nagłówku, a program mówi tytuł i poziom, na przykład "Installation, heading 3" - dokładnie tak, jak przy chodzeniu Controlem ze strzałkami. Sprawdź, czy ten komunikat nie ginie przy zamykaniu okna.
+
+ZMIERZONE 19.08.2026: komunikat NIE GINIE. Po Enter NVDA mówi "Plik testowy EdSharpNG 5.0.21, heading 1", a dopiero potem tytuł okna i "pole edycji, wielowierszowe". Kursor stanął na wybranym nagłówku.
 
 1.6. Otwórz F6, przejdź na inny nagłówek i naciśnij Escape. Oczekiwane: okno się zamyka, kursor w tekście NIE rusza się.
 
@@ -27,6 +35,8 @@ Do testów przyda się jeden plik z nagłówkami Markdown i kilkoma akapitami. T
 1.8. Naciśnij F6 w dokumencie bez żadnego nagłówka (na przykład w zwykłej notatce). Oczekiwane: sam komunikat "No headings!", okno się NIE otwiera.
 
 1.9. W dokumencie z blokiem kodu (trzy odwrotne apostrofy, a w środku linia zaczynająca się od kratki) naciśnij F6. Oczekiwane: linia z kratki WEWNĄTRZ bloku kodu nie jest nagłówkiem i nie ma jej w drzewie. To była pomyłka programu, którą znalazłem przy okazji - dotyczyła też testów z rozdziału 2, więc warto sprawdzić oba.
+
+ZMIERZONE 19.08.2026: PRZECHODZI. Zebrałem całe drzewo (7 pozycji) i linii "# to jest komentarz w kodzie" z wnętrza bloku ``` w nim NIE MA. Wszystkie 7 realnych nagłówków pliku jest obecnych, więc filtr nie odsiał niczego za dużo.
 
 1.10. Shift+F6, Control+F6 i Alt+F6 mają działać jak dotąd (spis treści i szukanie tematu). Sprawdź, czy przejęcie samego F6 ich nie ruszyło.
 
