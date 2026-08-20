@@ -4,7 +4,11 @@ Lista jest po polsku, ale komunikaty programu podaję po angielsku, bo interfejs
 
 Czego ta lista NIE jest: potwierdzeniem, że wszystko działa. Sprawdzam u siebie logikę w kodzie, czyli to, jaki tekst program wyliczy i gdzie postawi kursor.
 
-AKTUALIZACJA 19.08.2026: część testów o mowie potrafię już rozstrzygnąć SAM. Na maszynie z Windowsem stoi NVDA 2026.1.1 z mostkiem MCP, a do pomiaru tego, co czytnik REALNIE wymawia, dorobiłem dodatek "podsluchMowy" (zapisuje każdą wypowiedź NVDA do pliku). Wyniki zmierzone tą drogą są opisane niżej przy poszczególnych testach jako "ZMIERZONE". Nadal jednak nie mam JAWS-a, a testy 3.1 do 3.5 (zdania, słowa, akapity) pozostają dla Ciebie, bo klawisze wysyłane programowo przesuwają kursor, ale nie wywołują u NVDA reakcji mowy na ruch karetki - kontrola pozytywna (zwykła strzałka, która MUSI mówić) też milczała, więc to ograniczenie mojego pomiaru, nie wada programu.
+AKTUALIZACJA 20.08.2026: testy o mowie rozstrzygam już SAM, także te z rozdziału 3. Na maszynie z Windowsem stoi NVDA 2026.1.1 z mostkiem MCP, do pomiaru wymowy służy dodatek "podsluchMowy" (zapisuje każdą wypowiedź czytnika), a klawisze wysyłam przez systemowy SendInput, więc docierają do programu jak z prawdziwej klawiatury. Wyniki oznaczone są niżej jako "ZMIERZONE".
+
+Jedna uwaga o metodzie, bo zmieniła wnioski: sama mowa czytnika to za mało jako miara. NVDA nie zawsze ogłasza ruch kursora przy wejściu programowym, a wtedy cisza wygląda jak "komenda nie zadziałała". Dlatego każdy test rozdziału 3 ma DWIE miary: skutek w programie (pozycja kursora czytana wprost z pola edycji) oraz mowę czytnika. Skutek mówi, czy komenda się wykonała, mowa - czy brzmi poprawnie. Gdzie mowy nie było, piszę to wprost, zamiast zgadywać.
+
+Czego nadal NIE potrafię sprawdzić: JAWS-a nie mam, więc wszystko, co dotyczy jego zachowania, zostaje dla Ciebie.
 
 Jak zgłaszać: wystarczy numer testu i jedno zdanie, co usłyszałeś albo co się stało. Nie musisz przechodzić listy po kolei ani całej. Testy oznaczone jako pilne to te, których u siebie w ogóle nie sprawdziłem.
 
@@ -62,13 +66,21 @@ ZMIERZONE 19.08.2026: PRZECHODZI. Zebrałem całe drzewo (7 pozycji) i linii "# 
 
 3.1. PILNE, wersja 5.0.20: Alt+strzałka w górę i w dół, czyli zdania. Oczekiwane: zdanie jest czytane RAZ. Wcześniej słyszałeś je dwa razy, a czasem raz - i o to "czasem" właśnie chodziło: program i czytnik wyścigowali się o głos. Teraz program milczy i oddaje mowę czytnikowi, a tekst zdania trafia na pasek stanu, więc da się go dopytać.
 
+ZMIERZONE 20.08.2026, PRZECHODZI. Na akapicie z czterech zdań Alt+strzałka w dół przesuwa kursor dokładnie o jedno zdanie (ze znaku 0 na 35, potem o kolejne 50), a zdanie jest wypowiadane jeden raz, bez powtórzenia. Sprawdź proszę u siebie tylko jedno: czy tak samo brzmi to na JAWS-ie.
+
 3.2. Control+strzałka w lewo i w prawo, czyli słowa, na tekście z polskimi literami (na przykład "Parafia Wszystkich Świętych oraz żarówka"). Oczekiwane: każde słowo czytane raz i CAŁE. Wcześniej program łamał słowo na polskiej literze ("wszystkich", potem samo "ś", potem "więtych") i doklejał poprzednie słowo.
 
+ZMIERZONE 20.08.2026, PRZECHODZI - to najmocniejszy wynik z całego rozdziału. Na zdaniu "Parafia Wszystkich Świętych oraz żarówka" czytnik wymówił kolejno: "Wszystkich", "Świętych", "oraz", "żarówka" - słowa całe, z ogonkami, ani jednej samotnej litery. Kursor idzie równo do przodu (znaki 179, 190, 199, 204). Dawny defekt łamał "wszystkich" na "ś" i "więtych" i już go nie ma.
+
 3.3. Control+strzałka w górę i w dół, czyli akapity. Oczekiwane: słyszysz CAŁY akapit, a nie sam pierwszy wiersz, i nic nie jest powtórzone dwa razy. Sprawdź to w dwóch układach: akapit będący jednym długim zdaniem z zawijaniem wierszy, oraz akapit złożony z kilku krótkich linii przełamanych Enterem.
+
+ZMIERZONE 20.08.2026, PRZECHODZI dla akapitu z zawijaniem: kursor skacze o cały akapit (171 znaków), a czytnik podaje jego treść w całości, raz. Drugiego układu (kilka krótkich linii przełamanych Enterem) NIE zmierzyłem - to nadal prośba do Ciebie.
 
 3.4. Alt+strzałka w lewo i w prawo (fragmenty) oraz Alt+PageUp i Alt+PageDown (części). Oczekiwane: bez zmian, program mówi tu sam, bo tych klawiszy czytnik nie zajmuje.
 
 3.5. Zwykłe strzałki w górę i w dół. Oczekiwane: wiersz czytany raz, jak zawsze. To test kontrolny - jeśli tu też słyszysz dwa razy, przyczyna jest w ustawieniach czytnika, nie w programie.
+
+ZMIERZONE 20.08.2026, PRZECHODZI. Kursor schodzi o jeden wiersz i czytnik podaje go raz. Ten test był u mnie ważny podwójnie: służył jako kontrola samego pomiaru. Gdy zwykła strzałka - która MUSI mówić w każdym edytorze - milczała, wiedziałem, że wina jest w moim sposobie mierzenia, a nie w programie. Dzięki temu nie zgłosiłem Ci fałszywego defektu.
 
 3.6. Control+F1 (Key Describer), a potem Control+strzałka w prawo i Alt+strzałka w dół. Oczekiwane: opis klawisza NIE obiecuje już, że "EdSharp przeczyta" słowo albo zdanie, bo teraz robi to czytnik. Przy akapitach opis mówi, że czytnik czyta, a program dodaje dalsze wiersze akapitu.
 
